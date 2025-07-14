@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
         buttonSearch = findViewById(R.id.button_search)
@@ -24,15 +24,15 @@ class MainActivity : AppCompatActivity() {
         buttonSettings = findViewById(R.id.button_settings)
 
         buttonSearch.setOnClickListener {
-            Toast.makeText(this, "Кнопка Поиск нажата", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
         buttonMedia.setOnClickListener {
-            Toast.makeText(this, "Кнопка Медиатека нажата", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MediaActivity::class.java))
         }
 
         buttonSettings.setOnClickListener {
-            Toast.makeText(this, "Кнопка Настройки нажата", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
     }
