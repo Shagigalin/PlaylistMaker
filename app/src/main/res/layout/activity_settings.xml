@@ -50,9 +50,9 @@
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textColor="@color/black"
-            app:icon="@drawable/"
+            app:icon="@drawable/off"
             app:iconTint="#FF000000"
-            app:iconGravity="textStart"
+            app:iconGravity="end"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             />
