@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_gravity="start"
+            app:icon="@drawable/strel"
+            app:iconTint="#FF000000"
+            android:backgroundTint="@color/white"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="start"
+            android:text="Настройки"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:padding="10dp"
+
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:backgroundTint="@color/white"
+            android:text="Темная тема"
+            android:gravity="start|center_vertical"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            app:icon="@drawable/"
+            app:iconTint="#FF000000"
+            app:iconGravity="textStart"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:backgroundTint="@color/white"
+            android:text="Поделиться приложением"
+            android:gravity="start|center_vertical"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            app:icon="@drawable/share"
+            app:iconTint="#FF000000"
+            app:iconGravity="end"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:backgroundTint="@color/white"
+            android:text="Написать в поддержку"
+            android:gravity="start|center_vertical"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            app:icon="@drawable/help"
+            app:iconTint="#FF000000"
+            app:iconGravity="end"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="61dp"
+            android:backgroundTint="@color/white"
+            android:text="Пользовательское соглашение"
+            android:gravity="start|center_vertical"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            app:icon="@drawable/strel_r"
+            app:iconTint="#FF000000"
+            app:iconGravity="end"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

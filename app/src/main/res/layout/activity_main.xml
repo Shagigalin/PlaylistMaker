@@ -1,19 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/tools"
+    android:background="@color/blue"
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="Playlist maker"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:padding="16dp"/>
+
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/button_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:backgroundTint="@color/white"
+            android:background="@drawable/rounded_button"
+            android:text="Поиск"
+            android:textAllCaps="false"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"
+            app:icon="@drawable/poisk"
+            app:iconTint="#FF000000"
+            app:iconGravity="textStart"
+            />
+
+        <Button
+            android:id="@+id/button_media"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:backgroundTint="@color/white"
+            android:background="@drawable/rounded_button"
+            android:text="Медиатека"
+            android:textAllCaps="false"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"
+            app:icon="@drawable/media"
+            app:iconTint="#FF000000"
+            app:iconGravity="textStart"
+            />
+
+        <Button
+            android:id="@+id/button_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:backgroundTint="@color/white"
+            android:background="@drawable/rounded_button"
+            android:text="Настройки"
+            android:textAllCaps="false"
+            android:textSize="22sp"
+            android:textColor="@color/black"
+            app:icon="@drawable/nastr"
+            app:iconTint="#FF000000"
+            app:iconGravity="textStart"/>
+    </LinearLayout>
+
+</LinearLayout>
