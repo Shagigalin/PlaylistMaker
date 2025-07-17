@@ -15,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:text="Playlist maker"
+            android:text="@string/app_name"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="@dimen/sp22"
             android:padding="16dp"/>
 
 
@@ -36,13 +36,13 @@
             android:layout_weight="1"
             app:backgroundTint="@color/white"
             android:background="@drawable/rounded_button"
-            android:text="Поиск"
+            android:text="@string/search"
             android:textAllCaps="false"
-            android:textSize="22sp"
+            android:textSize="@dimen/sp22"
             android:textColor="@color/black"
             android:layout_marginBottom="16dp"
             app:icon="@drawable/poisk"
-            app:iconTint="#FF000000"
+            app:iconTint="@color/black"
             app:iconGravity="textStart"
             />
 
@@ -53,13 +53,13 @@
             android:layout_weight="1"
             app:backgroundTint="@color/white"
             android:background="@drawable/rounded_button"
-            android:text="Медиатека"
+            android:text="@string/media"
             android:textAllCaps="false"
-            android:textSize="22sp"
+            android:textSize="@dimen/sp22"
             android:textColor="@color/black"
             android:layout_marginBottom="16dp"
             app:icon="@drawable/media"
-            app:iconTint="#FF000000"
+            app:iconTint="@color/black"
             app:iconGravity="textStart"
             />
 
@@ -70,12 +70,12 @@
             android:layout_weight="1"
             app:backgroundTint="@color/white"
             android:background="@drawable/rounded_button"
-            android:text="Настройки"
+            android:text="@string/nastr"
             android:textAllCaps="false"
-            android:textSize="22sp"
+            android:textSize="@dimen/sp22"
             android:textColor="@color/black"
             app:icon="@drawable/nastr"
-            app:iconTint="#FF000000"
+            app:iconTint="@color/black"
             app:iconGravity="textStart"/>
     </LinearLayout>
 

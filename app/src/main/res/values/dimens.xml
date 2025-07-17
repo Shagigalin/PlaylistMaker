@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="sp22">22sp</dimen>
+    <dimen name="sp16">16sp</dimen>
+    <dimen name="header_height">56dp</dimen>
+    <dimen name="button_height">61dp</dimen>
+    <dimen name="button_width">61dp</dimen>
+    <dimen name="margin_bottom">24dp</dimen>
+    <dimen name="padding_standard">8dp</dimen>
+
+</resources>

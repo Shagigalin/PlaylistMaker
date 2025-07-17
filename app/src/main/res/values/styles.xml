@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+
+        <style name="SettingItemStyle">
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">@dimen/button_height</item>
+            <item name="android:textSize">@dimen/sp16</item>
+            <item name="android:textColor">@color/black</item>
+            <item name="android:gravity">start|center_vertical</item>
+            <item name="android:paddingStart">@dimen/padding_standard</item>
+            <item name="android:paddingEnd">@dimen/padding_standard</item>
+            <item name="android:background">@null</item>
+        </style>
+
+
+</resources>

@@ -9,99 +9,61 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp">
+        android:layout_height="@dimen/header_height"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_standard"
+        android:gravity="center_vertical">
 
-        <Button
+        <TextView
             android:id="@+id/button_back"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_gravity="start"
-            app:icon="@drawable/strel"
-            app:iconTint="#FF000000"
-            android:backgroundTint="@color/white"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="@dimen/button_height"
+            android:background="@null"
+            android:drawableStart="@drawable/strel"
+
             />
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="start"
-            android:text="Настройки"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/settings_title"
             android:textColor="@color/black"
-            android:textSize="22sp"
-            android:padding="10dp"
-
-            />
+            android:textSize="@dimen/sp22"
+            android:gravity="center_vertical" />
 
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="vertical"
+        android:layout_weight="1"
         >
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="61dp"
-            android:backgroundTint="@color/white"
-            android:text="Темная тема"
-            android:gravity="start|center_vertical"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:icon="@drawable/off"
-            app:iconTint="#FF000000"
-            app:iconGravity="end"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            />
+        <TextView
+            android:id="@+id/tema_button"
+            style="@style/SettingItemStyle"
+            android:text="@string/tema"
+            app:drawableEndCompat="@drawable/off" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="61dp"
-            android:backgroundTint="@color/white"
-            android:text="Поделиться приложением"
-            android:gravity="start|center_vertical"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:icon="@drawable/share"
-            app:iconTint="#FF000000"
-            app:iconGravity="end"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            />
+        <TextView
+            android:id="@+id/share_button"
+            style="@style/SettingItemStyle"
+            android:text="@string/share"
+            app:drawableEndCompat="@drawable/share" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="61dp"
-            android:backgroundTint="@color/white"
-            android:text="Написать в поддержку"
-            android:gravity="start|center_vertical"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:icon="@drawable/help"
-            app:iconTint="#FF000000"
-            app:iconGravity="end"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"/>
+        <TextView
+            android:id="@+id/help_button"
+            style="@style/SettingItemStyle"
+            android:text="@string/help"
+            app:drawableEndCompat="@drawable/help" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="61dp"
-            android:backgroundTint="@color/white"
-            android:text="Пользовательское соглашение"
-            android:gravity="start|center_vertical"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            app:icon="@drawable/strel_r"
-            app:iconTint="#FF000000"
-            app:iconGravity="end"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"/>
+        <TextView
+            android:id="@+id/strel_r_button"
+            style="@style/SettingItemStyle"
+            android:text="@string/strel_r"
+            app:drawableEndCompat="@drawable/strel_r" />
 
     </LinearLayout>
 
