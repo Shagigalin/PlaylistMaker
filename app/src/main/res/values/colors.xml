@@ -7,5 +7,6 @@
     <color name="my_light_primary_dark">#3700B3</color>
     <color name="my_light_accent">#03DAC5</color>
     <color name="textColorPrimary">#000000</color>
+    <color name="Grey">#E6E8EB</color>
 
 </resources>
