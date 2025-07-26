@@ -13,6 +13,8 @@
     <string name="share">Поделиться приложением</string>
     <string name="help">Написать в поддержку</string>
     <string name="strel_r">Пользовательское соглашение</string>
+    <string name="tema_light">Светлая тема</string>
+    <string name="tema_dark">Темная тема</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

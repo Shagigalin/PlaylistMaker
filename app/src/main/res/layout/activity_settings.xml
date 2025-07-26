@@ -55,7 +55,9 @@
             style="@style/SettingItemStyle"
             android:text="@string/tema"
             app:drawableEndCompat="@drawable/off"
-            android:textColor="?attr/colorOnSurface"/>
+            android:textColor="?attr/colorOnSurface"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <TextView
             android:id="@+id/share_button"
