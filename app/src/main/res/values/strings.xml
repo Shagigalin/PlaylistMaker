@@ -16,6 +16,24 @@
     <string name="tema_light">Светлая тема</string>
     <string name="tema_dark">Темная тема</string>
 
+    <!-- Ссылка на курс -->
+    <string name="android_course_url">https://practicum.yandex.ru/android-developer/</string>
+
+    <!-- Текст для шаринга -->
+    <string name="share_course_text">Привет! Посмотри этот крутой курс по Android-разработке от Практикума:\n\n🔗 %s\n\nТам можно научиться создавать современные приложения под Android!</string>
+    <string name="share_dialog_title">Поделиться курсом</string>
+    <string name="no_apps_found">Не найдено приложений для отправки</string>
+
+    <!-- Данные для email -->
+    <string name="support_email">ufa-gazinur@mail.ru</string>
+    <string name="email_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="email_body">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="no_email_client">Почтовое приложение не найдено</string>
+
+    <!-- Ссылка на оферту -->
+    <string name="terms_url">https://yandex.ru/legal/practicum_offer/ru/</string>
+    <string name="no_browser_found">Браузер не найден</string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>

@@ -1,12 +1,12 @@
 package com.example.playlistmaker
 
 import android.content.ActivityNotFoundException
-import android.widget.Toast
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 
@@ -15,12 +15,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var temaButton: TextView
     private val PREFS_NAME = "theme_prefs"
     private val THEME_KEY = "current_theme"
-    private val SUPPORT_EMAIL = "ufa-gazinur@mail.ru"
-    private val TERMS_URL = "https://yandex.ru/legal/practicum_offer/ru/"
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val isDarkTheme = prefs.getBoolean(THEME_KEY, false)
         if (isDarkTheme) {
@@ -32,29 +28,29 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // Кнопка "Назад"
         findViewById<TextView>(R.id.button_back).setOnClickListener {
             onBackPressed()
         }
 
-
+        // Кнопка темы
         temaButton = findViewById(R.id.tema_button)
-
-
         updateButtonUI(isDarkTheme)
-
-
         temaButton.setOnClickListener {
             toggleTheme()
         }
 
+        // Кнопка "Поделиться"
         findViewById<TextView>(R.id.share_button).setOnClickListener {
             shareApp()
         }
 
+        // Кнопка "Написать в поддержку"
         findViewById<TextView>(R.id.help_button).setOnClickListener {
             contactSupport()
         }
 
+        // Кнопка "Пользовательское соглашение"
         findViewById<TextView>(R.id.strel_r_button).setOnClickListener {
             openTerms()
         }
@@ -65,18 +61,14 @@ class SettingsActivity : AppCompatActivity() {
         val isDarkTheme = prefs.getBoolean(THEME_KEY, false)
 
         if (isDarkTheme) {
-
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             prefs.edit().putBoolean(THEME_KEY, false).apply()
             updateButtonUI(false)
         } else {
-
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             prefs.edit().putBoolean(THEME_KEY, true).apply()
             updateButtonUI(true)
         }
-
-
         recreate()
     }
 
@@ -89,12 +81,9 @@ class SettingsActivity : AppCompatActivity() {
             temaButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.off, 0)
         }
     }
+
     private fun shareApp() {
-        val shareText = """
-            Привет! Посмотри этот крутой курс по Android-разработке от Практикума:
-                        🔗 https://practicum.yandex.ru/android-developer/
-                       
-        """.trimIndent()
+        val shareText = getString(R.string.share_course_text, getString(R.string.android_course_url))
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
@@ -102,18 +91,18 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         try {
-            startActivity(Intent.createChooser(shareIntent, "Поделиться курсом"))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dialog_title)))
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "Не найдено приложений для отправки", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_apps_found), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun contactSupport() {
         val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(SUPPORT_EMAIL))
-            putExtra(Intent.EXTRA_SUBJECT, "Сообщение разработчикам и разработчицам приложения Playlist Maker")
-            putExtra(Intent.EXTRA_TEXT, "Спасибо разработчикам и разработчицам за крутое приложение!")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))
         }
 
         try {
@@ -121,21 +110,21 @@ class SettingsActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(
                 this,
-                "На устройстве не найдено почтового приложения",
+                getString(R.string.no_email_client),
                 Toast.LENGTH_SHORT
             ).show()
         }
     }
 
     private fun openTerms() {
-        val termsIntent = Intent(Intent.ACTION_VIEW, Uri.parse(TERMS_URL))
+        val termsIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.terms_url)))
 
         try {
             startActivity(termsIntent)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(
                 this,
-                "Браузер не найден",
+                getString(R.string.no_browser_found),
                 Toast.LENGTH_SHORT
             ).show()
         }
