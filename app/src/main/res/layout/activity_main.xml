@@ -4,12 +4,14 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/blue"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorPrimaryVariant"
+    >
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
         <TextView
             android:layout_width="match_parent"
@@ -18,65 +20,46 @@
             android:text="@string/app_name"
             android:textColor="@color/white"
             android:textSize="@dimen/sp22"
-            android:padding="16dp"/>
-
-
+            android:padding="16dp"
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
+            />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
 
+        >
+
+        <!-- Кнопка поиска -->
         <Button
             android:id="@+id/button_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:backgroundTint="@color/white"
-            android:background="@drawable/rounded_button"
+            style="@style/MyButtonStyle"
             android:text="@string/search"
-            android:textAllCaps="false"
-            android:textSize="@dimen/sp22"
-            android:textColor="@color/black"
-            android:layout_marginBottom="16dp"
             app:icon="@drawable/poisk"
-            app:iconTint="@color/black"
-            app:iconGravity="textStart"
+
             />
 
+        <!-- Кнопка media -->
         <Button
             android:id="@+id/button_media"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:backgroundTint="@color/white"
-            android:background="@drawable/rounded_button"
+            style="@style/MyButtonStyle"
             android:text="@string/media"
-            android:textAllCaps="false"
-            android:textSize="@dimen/sp22"
-            android:textColor="@color/black"
-            android:layout_marginBottom="16dp"
             app:icon="@drawable/media"
-            app:iconTint="@color/black"
-            app:iconGravity="textStart"
+
             />
 
+        <!-- Кнопка настроек -->
         <Button
             android:id="@+id/button_settings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:backgroundTint="@color/white"
-            android:background="@drawable/rounded_button"
+            style="@style/MyButtonStyle"
             android:text="@string/nastr"
-            android:textAllCaps="false"
-            android:textSize="@dimen/sp22"
-            android:textColor="@color/black"
             app:icon="@drawable/nastr"
-            app:iconTint="@color/black"
-            app:iconGravity="textStart"/>
+
+            />
     </LinearLayout>
 
 </LinearLayout>
