@@ -1,65 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorPrimaryVariant"
-    >
+    android:background="?attr/colorPrimaryVariant">
 
-    <FrameLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimaryVariant"
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
+        app:titleTextColor="@color/white"/>
+
+    <!-- Кнопка поиска -->
+    <Button
+        android:id="@+id/button_search"
+        style="@style/MyButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
+        android:layout_margin="16dp"
+        android:text="@string/search"
+        app:icon="@drawable/poisk"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:text="@string/app_name"
-            android:textColor="@color/white"
-            android:textSize="@dimen/sp22"
-            android:padding="16dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:textFontWeight="500"
-            />
-    </FrameLayout>
-
-    <LinearLayout
+    <!-- Кнопка media -->
+    <Button
+        android:id="@+id/button_media"
+        style="@style/MyButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/media"
+        app:icon="@drawable/media"/>
 
-        >
-
-        <!-- Кнопка поиска -->
-        <Button
-            android:id="@+id/button_search"
-            style="@style/MyButtonStyle"
-            android:text="@string/search"
-            app:icon="@drawable/poisk"
-
-            />
-
-        <!-- Кнопка media -->
-        <Button
-            android:id="@+id/button_media"
-            style="@style/MyButtonStyle"
-            android:text="@string/media"
-            app:icon="@drawable/media"
-
-            />
-
-        <!-- Кнопка настроек -->
-        <Button
-            android:id="@+id/button_settings"
-            style="@style/MyButtonStyle"
-            android:text="@string/nastr"
-            app:icon="@drawable/nastr"
-
-            />
-    </LinearLayout>
+    <!-- Кнопка настроек -->
+    <Button
+        android:id="@+id/button_settings"
+        style="@style/MyButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/nastr"
+        app:icon="@drawable/nastr"/>
 
 </LinearLayout>

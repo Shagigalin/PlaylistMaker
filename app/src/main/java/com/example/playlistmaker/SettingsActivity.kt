@@ -5,128 +5,112 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var temaButton: TextView
-    private val PREFS_NAME = "theme_prefs"
-    private val THEME_KEY = "current_theme"
+    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var themeSwitch: SwitchMaterial
+    private lateinit var sharedPrefs: SharedPreferences
+
+    companion object {
+        private const val PREFS_NAME = "theme_prefs"
+        private const val THEME_KEY = "current_theme"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val isDarkTheme = prefs.getBoolean(THEME_KEY, false)
-        if (isDarkTheme) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        // Инициализация SharedPreferences
+        sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+
+        // Применение темы перед созданием активности
+        applyTheme(sharedPrefs.getBoolean(THEME_KEY, false))
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
 
-        // Кнопка "Назад"
-        findViewById<TextView>(R.id.button_back).setOnClickListener {
-            onBackPressed()
-        }
+        // Инициализация View Binding
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Кнопка темы
-        temaButton = findViewById(R.id.tema_button)
-        updateButtonUI(isDarkTheme)
-        temaButton.setOnClickListener {
-            toggleTheme()
-        }
+        initViews()
+        setupToolbar()
+        setupThemeSwitch()
+    }
 
-        // Кнопка "Поделиться"
-        findViewById<TextView>(R.id.share_button).setOnClickListener {
-            shareApp()
-        }
+    private fun initViews() {
+        themeSwitch = binding.themeSwitch
+    }
 
-        // Кнопка "Написать в поддержку"
-        findViewById<TextView>(R.id.help_button).setOnClickListener {
-            contactSupport()
-        }
-
-        // Кнопка "Пользовательское соглашение"
-        findViewById<TextView>(R.id.strel_r_button).setOnClickListener {
-            openTerms()
+    private fun setupToolbar() {
+        binding.toolbar.apply {
+            setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
         }
     }
 
-    private fun toggleTheme() {
-        val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val isDarkTheme = prefs.getBoolean(THEME_KEY, false)
-
-        if (isDarkTheme) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            prefs.edit().putBoolean(THEME_KEY, false).apply()
-            updateButtonUI(false)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            prefs.edit().putBoolean(THEME_KEY, true).apply()
-            updateButtonUI(true)
+    private fun setupThemeSwitch() {
+        themeSwitch.isChecked = sharedPrefs.getBoolean(THEME_KEY, false)
+        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            sharedPrefs.edit { putBoolean(THEME_KEY, isChecked) }
+            applyTheme(isChecked)
+            recreate()
         }
-        recreate()
+
+        // Настройка обработчиков кликов
+        binding.shareButton.setOnClickListener { shareApp() }
+        binding.helpButton.setOnClickListener { contactSupport() }
+        binding.feedbackButton.setOnClickListener { openTerms() }
     }
 
-    private fun updateButtonUI(isDarkModeEnabled: Boolean) {
-        if (isDarkModeEnabled) {
-            temaButton.text = getString(R.string.tema_dark)
-            temaButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.on, 0)
-        } else {
-            temaButton.text = getString(R.string.tema_light)
-            temaButton.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.off, 0)
-        }
+    private fun applyTheme(isDark: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     private fun shareApp() {
-        val shareText = getString(R.string.share_course_text, getString(R.string.android_course_url))
-
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-
         try {
-            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dialog_title)))
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT,
+                        getString(R.string.share_course_text, getString(R.string.android_course_url)))
+                },
+                getString(R.string.share_dialog_title)
+            ).also { startActivity(it) }
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, getString(R.string.no_apps_found), Toast.LENGTH_SHORT).show()
+            showToast(R.string.no_apps_found)
         }
     }
 
     private fun contactSupport() {
-        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
-            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))
-        }
-
         try {
-            startActivity(emailIntent)
+            Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))
+            }.also { startActivity(it) }
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(
-                this,
-                getString(R.string.no_email_client),
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast(R.string.no_email_client)
         }
     }
 
     private fun openTerms() {
-        val termsIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.terms_url)))
-
         try {
-            startActivity(termsIntent)
+            Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.terms_url)))
+                .also { startActivity(it) }
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(
-                this,
-                getString(R.string.no_browser_found),
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast(R.string.no_browser_found)
         }
+    }
+
+    private fun showToast(messageRes: Int) {
+        Toast.makeText(this, getString(messageRes), Toast.LENGTH_SHORT).show()
     }
 }
