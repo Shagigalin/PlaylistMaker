@@ -4,4 +4,8 @@
     <color name="my_dark_primary_dark">#3700B3</color>
     <color name="my_dark_accent">#03DAC5</color>
     <color name="textColorPrimary">#FFFFFF</color>
+    <color name="green_active">#3772E7</color>
+    <color name="gray_inactive">#757575</color>
+    <color name="green_active_transparent">#9FBBF3</color>
+    <color name="gray_inactive_transparent">#9FBBF3</color>
 </resources>
