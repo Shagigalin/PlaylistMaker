@@ -8,15 +8,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var themeSwitch: SwitchMaterial
     private lateinit var sharedPrefs: SharedPreferences
 
     companion object {
@@ -37,33 +35,44 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initViews()
-        setupToolbar()
-        setupThemeSwitch()
+        setupViews()
+        updateThemeIcon()
     }
 
-    private fun initViews() {
-        themeSwitch = binding.themeSwitch
-    }
-
-    private fun setupToolbar() {
-        binding.toolbar.apply {
-            setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+    private fun setupViews() {
+        // Кнопка назад
+        binding.buttonBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
-    }
 
-    private fun setupThemeSwitch() {
-        themeSwitch.isChecked = sharedPrefs.getBoolean(THEME_KEY, false)
-        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            sharedPrefs.edit { putBoolean(THEME_KEY, isChecked) }
-            applyTheme(isChecked)
+        // Переключение темы
+        binding.temaButton.setOnClickListener {
+            val newThemeState = !sharedPrefs.getBoolean(THEME_KEY, false)
+            sharedPrefs.edit { putBoolean(THEME_KEY, newThemeState) }
+            applyTheme(newThemeState)
+            updateThemeIcon()
             recreate()
         }
 
-        // Настройка обработчиков кликов
+        // Поделиться приложением
         binding.shareButton.setOnClickListener { shareApp() }
+
+        // Справка
         binding.helpButton.setOnClickListener { contactSupport() }
-        binding.feedbackButton.setOnClickListener { openTerms() }
+
+        // Условия использования
+        binding.strelRButton.setOnClickListener { openTerms() }
+    }
+
+    private fun updateThemeIcon() {
+        val isDarkTheme = sharedPrefs.getBoolean(THEME_KEY, false)
+        val iconRes = if (isDarkTheme) R.drawable.on else R.drawable.off
+        binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            null,
+            null,
+            ContextCompat.getDrawable(this, iconRes),
+            null
+        )
     }
 
     private fun applyTheme(isDark: Boolean) {
