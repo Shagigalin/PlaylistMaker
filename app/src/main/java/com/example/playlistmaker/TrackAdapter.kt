@@ -33,8 +33,8 @@ class TrackAdapter(
 
                 Glide.with(itemView)
                     .load(track.artworkUrl100)
-                    .placeholder(android.R.drawable.ic_media_play)
-                    .placeholder(android.R.drawable.ic_media_play)
+                    .placeholder(R.drawable.arrow)
+                    .error(R.drawable.arrow)
                     .transform(RoundedCorners(itemView.resources.getDimensionPixelSize(R.dimen.corner_radius)))
                     .into(artwork)
 

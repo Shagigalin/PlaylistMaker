@@ -6,10 +6,16 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.core.view.updateLayoutParams
+import android.view.ViewGroup
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
@@ -23,6 +29,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Включаем Edge-to-Edge ДО setContentView()
+        enableEdgeToEdge()
+
         // Инициализация SharedPreferences
         sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
@@ -35,8 +44,36 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Настраиваем обработку системных инсетов
+        setupEdgeToEdge()
+
         setupViews()
         updateThemeIcon()
+    }
+
+    private fun setupEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+
+            // Обновляем отступы для корневого View
+            view.updatePadding(
+                top = statusBarInsets.top,
+                bottom = navigationBarInsets.bottom
+            )
+
+            insets
+        }
+
+        // Настраиваем кнопку назад для Edge-to-Edge
+
+    }
+
+
+
+    // Функция для конвертации dp в px
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun setupViews() {

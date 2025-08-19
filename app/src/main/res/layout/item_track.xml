@@ -76,6 +76,7 @@
         android:layout_marginStart="13dp"
         android:layout_marginTop="8dp"
         android:scaleType="center"
-        app:srcCompat="@drawable/strel_r"
+        app:srcCompat="@drawable/arrow"
+        android:drawableTint="?attr/colorSecondary"
          />
 </LinearLayout>

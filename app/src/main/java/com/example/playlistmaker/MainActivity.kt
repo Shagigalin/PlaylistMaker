@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.Button
 import android.widget.Toast
+import androidx.core.view.updatePadding
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,8 +17,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonSettings: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        enableEdgeToEdge()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        setupEdgeToEdge()
 
         buttonSearch = findViewById(R.id.button_search)
         buttonMedia = findViewById(R.id.button_media)
@@ -34,6 +41,20 @@ class MainActivity : AppCompatActivity() {
         buttonSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+    }
 
+    private fun setupEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+
+            // Обновляем отступы для корневого View
+            view.updatePadding(
+                top = statusBarInsets.top,
+                bottom = navigationBarInsets.bottom
+            )
+
+            insets
+        }
     }
 }

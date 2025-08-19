@@ -4,18 +4,26 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
+
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 
 class SearchActivity : AppCompatActivity() {
 
@@ -32,14 +40,35 @@ class SearchActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Включаем Edge-to-Edge ДО setContentView()
+        enableEdgeToEdge()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        // Настраиваем обработку системных инсетов
+        setupEdgeToEdge()
 
         initViews()
         setupRecyclerView()
         setupToolbar()
         setupSearchEditText()
         restoreState(savedInstanceState)
+    }
+
+    private fun setupEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+
+            // Обновляем отступы для корневого View
+            view.updatePadding(
+                top = statusBarInsets.top,
+                bottom = navigationBarInsets.bottom
+            )
+
+            insets
+        }
     }
 
     private fun initViews() {
@@ -62,6 +91,18 @@ class SearchActivity : AppCompatActivity() {
     private fun setupToolbar() {
         toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+
+        // Делаем Toolbar прозрачным для Edge-to-Edge
+        toolbar.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+
+        // Добавляем отступы для статус бара в Toolbar
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = statusBarInsets.top
+            }
+            insets
         }
     }
 
@@ -97,6 +138,11 @@ class SearchActivity : AppCompatActivity() {
                     clearButton.isVisible = true
                 }
             }
+        }
+
+        // Обработка клика по кнопке очистки
+        clearButton.setOnClickListener {
+            clearSearch()
         }
     }
 
