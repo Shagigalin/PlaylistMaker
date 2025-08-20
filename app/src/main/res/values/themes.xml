@@ -5,10 +5,10 @@
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/blue</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorPrimary">@color/YP_Black</item>
         <item name="android:textColorSecondary">@color/white</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="colorOnSurfaceVariant">@color/black</item>
+        <item name="colorOnSurface">@color/YP_Black</item>
+        <item name="colorOnSurfaceVariant">@color/YP_Black</item>
         <item name="colorSecondary">@color/green_active</item>
 
 
