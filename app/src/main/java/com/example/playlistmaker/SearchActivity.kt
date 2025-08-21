@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -21,6 +24,16 @@ import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
 
@@ -29,23 +42,29 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TrackAdapter
-    private lateinit var noResultsTextView: TextView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var errorLayout: View
+    private lateinit var errorImage: ImageView
+    private lateinit var errorText: TextView
+    private lateinit var retryButton: Button
+    private lateinit var noResultsLayout: LinearLayout
+    private lateinit var noResultsImage: ImageView
+    private lateinit var noResultsText: TextView
+
     private var searchQuery: String = ""
+    private var currentSearchJob: Job? = null
 
     companion object {
         private const val SEARCH_QUERY_KEY = "search_query"
+        private const val SEARCH_DELAY_MS = 2000L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Включаем Edge-to-Edge ДО setContentView()
         enableEdgeToEdge()
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        // Настраиваем обработку системных инсетов
         setupEdgeToEdge()
-
         initViews()
         setupRecyclerView()
         setupToolbar()
@@ -54,28 +73,34 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
-            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
 
 
-            // Обновляем отступы для корневого View
+                toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = statusBarInsets.top
+                }
 
 
-            // Добавляем отступы для статус бара в Toolbar
-            toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = statusBarInsets.top
+
+                insets
             }
-
-            insets
         }
-    }
 
     private fun initViews() {
         toolbar = findViewById(R.id.toolbar)
         searchEditText = findViewById(R.id.search_edit_text)
         clearButton = findViewById(R.id.clear_button)
         recyclerView = findViewById(R.id.search_results_recycler)
-        noResultsTextView = findViewById(R.id.no_results_text)
+        progressBar = findViewById(R.id.progressBar)
+        errorLayout = findViewById(R.id.errorLayout)
+        errorImage = findViewById(R.id.errorImage)
+        errorText = findViewById(R.id.errorText)
+        retryButton = findViewById(R.id.retryButton)
+        noResultsLayout = findViewById(R.id.noResultsLayout)
+        noResultsImage = findViewById(R.id.noResultsImage)
+        noResultsText = findViewById(R.id.noResultsText)
     }
 
     private fun setupRecyclerView() {
@@ -91,7 +116,6 @@ class SearchActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        // Убраны все манипуляции с insets из toolbar
     }
 
     private fun setupSearchEditText() {
@@ -117,7 +141,17 @@ class SearchActivity : AppCompatActivity() {
                 override fun afterTextChanged(s: Editable?) {
                     clearButton.isVisible = !s.isNullOrEmpty()
                     searchQuery = s?.toString() ?: ""
-                    performSearch()
+
+                    currentSearchJob?.cancel()
+
+                    if (searchQuery.isNotEmpty()) {
+                        currentSearchJob = CoroutineScope(Dispatchers.Main).launch {
+                            delay(SEARCH_DELAY_MS)
+                            performSearch()
+                        }
+                    } else {
+                        showEmptyState()
+                    }
                 }
             })
 
@@ -128,71 +162,101 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // Обработка клика по кнопке очистки
         clearButton.setOnClickListener {
             clearSearch()
+        }
+
+        retryButton.setOnClickListener {
+            performSearch()
         }
     }
 
     private fun performSearch() {
-        val filteredTracks = if (searchQuery.isEmpty()) {
-            emptyList()
-        } else {
-            getMockTracks().filter {
-                it.trackName.contains(searchQuery, ignoreCase = true) ||
-                        it.artistName.contains(searchQuery, ignoreCase = true)
+        if (searchQuery.isEmpty()) {
+            showEmptyState()
+            return
+        }
+
+        showLoading()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.api.searchTracks(searchQuery)
+                withContext(Dispatchers.Main) {
+                    if (response.resultCount > 0) {
+                        showSearchResults(response.results)
+                    } else {
+                        showNoResults()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showErrorState()
+                }
             }
         }
-
-        updateSearchResults(filteredTracks)
     }
 
-    private fun updateSearchResults(tracks: List<Track>) {
+    private fun showLoading() {
+        recyclerView.visibility = View.GONE
+        noResultsLayout.visibility = View.GONE
+        errorLayout.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun showSearchResults(tracks: List<Track>) {
+        progressBar.visibility = View.GONE
+        errorLayout.visibility = View.GONE
+        noResultsLayout.visibility = View.GONE
+
         adapter.updateTracks(tracks)
-
-        if (tracks.isEmpty() && searchQuery.isNotEmpty()) {
-            recyclerView.visibility = View.GONE
-            noResultsTextView.visibility = View.VISIBLE
-            noResultsTextView.text = getString(R.string.no_results, searchQuery)
-        } else {
-            recyclerView.visibility = if (tracks.isNotEmpty()) View.VISIBLE else View.GONE
-            noResultsTextView.visibility = View.GONE
-        }
+        recyclerView.visibility = View.VISIBLE
     }
 
-    private fun getMockTracks(): List<Track> {
-        return listOf(
-            Track(
-                "Smells Like Teen Spirit",
-                "Nirvana",
-                "5:01",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Billie Jean",
-                "Michael Jackson",
-                "4:35",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Stayin' Alive",
-                "Bee Gees",
-                "4:10",
-                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Whole Lotta Love",
-                "Led Zeppelin",
-                "5:33",
-                "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Sweet Child O'Mine",
-                "Guns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
+    private fun showNoResults() {
+        progressBar.visibility = View.GONE
+        errorLayout.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+
+        noResultsLayout.visibility = View.VISIBLE
+        noResultsText.text = getString(R.string.no_results_found) // Исправлено
+
+        val noResultsDrawable = if (isDarkTheme()) {
+            R.drawable.noinfdark
+        } else {
+            R.drawable.noinflight
+        }
+        noResultsImage.setImageResource(noResultsDrawable)
+    }
+
+    private fun showErrorState() {
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        noResultsLayout.visibility = View.GONE
+
+        errorLayout.visibility = View.VISIBLE
+        errorText.text = getString(R.string.connection_error)
+
+        val errorDrawable = if (isDarkTheme()) {
+            R.drawable.nointernetdark
+        } else {
+            R.drawable.nointernetlight
+        }
+        errorImage.setImageResource(errorDrawable)
+    }
+
+    private fun showEmptyState() {
+        progressBar.visibility = View.GONE
+        errorLayout.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        noResultsLayout.visibility = View.GONE
+    }
+
+    private fun isDarkTheme(): Boolean {
+        return when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
+            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
     }
 
     private fun clearSearch() {
@@ -203,7 +267,7 @@ class SearchActivity : AppCompatActivity() {
         }
         clearButton.isVisible = false
         searchQuery = ""
-        updateSearchResults(emptyList())
+        showEmptyState()
     }
 
     private fun hideKeyboard() {
@@ -226,3 +290,4 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(SEARCH_QUERY_KEY, searchQuery)
     }
 }
+

@@ -12,8 +12,19 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class TrackAdapter(
     private var tracks: List<Track>,
-    private val onItemClick: (Track) -> Unit
+    private val onTrackClick: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_track, parent, false)
+        return TrackViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        holder.bind(tracks[position])
+    }
+
+    override fun getItemCount(): Int = tracks.size
 
     fun updateTracks(newTracks: List<Track>) {
         tracks = newTracks
@@ -29,28 +40,18 @@ class TrackAdapter(
         fun bind(track: Track) {
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = track.trackTime
+            trackTime.text = track.getFormattedTime()
 
-                Glide.with(itemView)
-                    .load(track.artworkUrl100)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    .transform(RoundedCorners(itemView.resources.getDimensionPixelSize(R.dimen.corner_radius)))
-                    .into(artwork)
+            // Загрузка обложки с Glide
+            Glide.with(itemView)
+                .load(track.artworkUrl100)
+                .placeholder(R.drawable.placeholder) // Заглушка
+                .error(R.drawable.placeholder) // Заглушка при ошибке
+                .into(artwork)
 
-            itemView.setOnClickListener { onItemClick(track) }
+            itemView.setOnClickListener {
+                onTrackClick(track)
             }
         }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_track, parent, false)
-        return TrackViewHolder(view)
     }
-
-    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
-    }
-
-    override fun getItemCount(): Int = tracks.size
 }
