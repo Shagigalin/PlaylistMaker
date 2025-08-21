@@ -24,7 +24,7 @@
             android:layout_height="@dimen/button_height"
             android:background="@null"
             android:drawableStart="@drawable/strel"
-            android:drawableTint="?attr/colorOnSurface"
+            android:drawableTint="?attr/android:textColorPrimary"
 
 
             />
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/settings_title"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="?attr/android:textColorPrimary"
             android:textSize="@dimen/sp22"
             android:fontFamily="@font/ys_display_medium"
             android:textFontWeight="500"
@@ -55,7 +55,7 @@
             style="@style/SettingItemStyle"
             android:text="@string/tema"
             app:drawableEndCompat="@drawable/off"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="?attr/android:textColorPrimary"
             android:clickable="true"
             android:focusable="true"/>
 
@@ -64,21 +64,21 @@
             style="@style/SettingItemStyle"
             android:text="@string/share"
             app:drawableEndCompat="@drawable/share"
-            android:textColor="?attr/colorOnSurface"/>
+            android:textColor="?attr/android:textColorPrimary"/>
 
         <TextView
             android:id="@+id/help_button"
             style="@style/SettingItemStyle"
             android:text="@string/help"
             app:drawableEndCompat="@drawable/help"
-            android:textColor="?attr/colorOnSurface"/>
+            android:textColor="?attr/android:textColorPrimary"/>
 
         <TextView
             android:id="@+id/strel_r_button"
             style="@style/SettingItemStyle"
             android:text="@string/strel_r"
             app:drawableEndCompat="@drawable/strel_r"
-            android:textColor="?attr/colorOnSurface"/>
+            android:textColor="?attr/android:textColorPrimary"/>
 
     </LinearLayout>
 

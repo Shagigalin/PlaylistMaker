@@ -6,17 +6,21 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.core.view.updateLayoutParams
+import android.view.ViewGroup
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var themeSwitch: SwitchMaterial
     private lateinit var sharedPrefs: SharedPreferences
 
     companion object {
@@ -25,6 +29,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Включаем Edge-to-Edge ДО setContentView()
+        enableEdgeToEdge()
+
         // Инициализация SharedPreferences
         sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
@@ -37,33 +44,72 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initViews()
-        setupToolbar()
-        setupThemeSwitch()
+        // Настраиваем обработку системных инсетов
+        setupEdgeToEdge()
+
+        setupViews()
+        updateThemeIcon()
     }
 
-    private fun initViews() {
-        themeSwitch = binding.themeSwitch
-    }
+    private fun setupEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
 
-    private fun setupToolbar() {
-        binding.toolbar.apply {
-            setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+            // Обновляем отступы для корневого View
+            view.updatePadding(
+                top = statusBarInsets.top,
+                bottom = navigationBarInsets.bottom
+            )
+
+            insets
         }
+
+        // Настраиваем кнопку назад для Edge-to-Edge
+
     }
 
-    private fun setupThemeSwitch() {
-        themeSwitch.isChecked = sharedPrefs.getBoolean(THEME_KEY, false)
-        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            sharedPrefs.edit { putBoolean(THEME_KEY, isChecked) }
-            applyTheme(isChecked)
+
+
+    // Функция для конвертации dp в px
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
+    }
+
+    private fun setupViews() {
+        // Кнопка назад
+        binding.buttonBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
+        // Переключение темы
+        binding.temaButton.setOnClickListener {
+            val newThemeState = !sharedPrefs.getBoolean(THEME_KEY, false)
+            sharedPrefs.edit { putBoolean(THEME_KEY, newThemeState) }
+            applyTheme(newThemeState)
+            updateThemeIcon()
             recreate()
         }
 
-        // Настройка обработчиков кликов
+        // Поделиться приложением
         binding.shareButton.setOnClickListener { shareApp() }
+
+        // Справка
         binding.helpButton.setOnClickListener { contactSupport() }
-        binding.feedbackButton.setOnClickListener { openTerms() }
+
+        // Условия использования
+        binding.strelRButton.setOnClickListener { openTerms() }
+    }
+
+    private fun updateThemeIcon() {
+        val isDarkTheme = sharedPrefs.getBoolean(THEME_KEY, false)
+        val iconRes = if (isDarkTheme) R.drawable.on else R.drawable.off
+        binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            null,
+            null,
+            ContextCompat.getDrawable(this, iconRes),
+            null
+        )
     }
 
     private fun applyTheme(isDark: Boolean) {
