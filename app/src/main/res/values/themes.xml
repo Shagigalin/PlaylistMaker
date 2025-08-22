@@ -10,6 +10,11 @@
         <item name="colorOnSurface">@color/YP_Black</item>
         <item name="colorOnSurfaceVariant">@color/YP_Black</item>
         <item name="colorSecondary">@color/green_active</item>
+        <item name="colorSurface">@color/green_active</item>
+        <item name="colorPrimaryContainer">@color/YP_Black</item>
+        <item name="colorOnPrimaryContainer">@color/green_active</item>
+        <item name="android:textColor">@color/green_active</item>
+
 
 
 

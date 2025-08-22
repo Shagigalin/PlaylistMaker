@@ -18,30 +18,34 @@
         app:navigationIconTint="?attr/android:textColorPrimary"/>
 
     <!-- Поисковая строка -->
+
+    <!-- Progress Bar -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="62dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="54dp"
+
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="39dp"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/edittext_rounded_bg"
+            android:drawableStart="@drawable/poisk"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/ys_display_regular"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionDone"
             android:paddingStart="12dp"
             android:paddingEnd="48dp"
             android:singleLine="true"
-            android:hint="@string/search_hint"
-            tools:text=""
-            android:drawableStart="@drawable/poisk"
-            android:fontFamily="@font/ys_display_regular"
-            android:textFontWeight="400"
             android:textColor="?attr/colorOnSurface"
-            android:titleTextColor="?attr/colorOnSurface"
-            android:textColorHint="?attr/colorOnSurfaceVariant"
-            android:imeOptions="actionDone"/>
+            android:textColorHint="?attr/colorSurface"
+            android:textFontWeight="400"
+            android:titleTextColor="?attr/colorSurface"
+            tools:text="" />
 
         <ImageView
             android:id="@+id/clear_button"
@@ -49,12 +53,11 @@
             android:layout_height="16dp"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/vector"
             android:contentDescription="@string/clear_search"
-            android:visibility="gone"/>
+            android:src="@drawable/vector"
+            android:visibility="gone" />
     </FrameLayout>
 
-    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -70,7 +73,9 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="gone"
+
+        >
 
         <ImageView
             android:id="@+id/errorImage"
@@ -96,12 +101,17 @@
 
         <Button
             android:id="@+id/retryButton"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/retry"
+            android:textSize="14sp"
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
             android:textAllCaps="false"
             android:background="@drawable/button_rounded_bg"
-            android:textColor="?attr/colorOnSurfaceVariant"
+
+            android:textColor="?attr/colorOnPrimaryContainer"
             />
 
     </LinearLayout>
@@ -140,7 +150,7 @@
         android:id="@+id/search_results_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
+
         android:clipToPadding="false"
         android:padding="8dp"
         android:visibility="gone"

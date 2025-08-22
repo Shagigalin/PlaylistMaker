@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,20 +21,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
 
 class SearchActivity : AppCompatActivity() {
 
@@ -52,7 +42,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noResultsText: TextView
 
     private var searchQuery: String = ""
-    private var currentSearchJob: Job? = null
+    private var searchJob: android.os.Handler? = null
+    private val searchRunnable = Runnable { performSearch() }
 
     companion object {
         private const val SEARCH_QUERY_KEY = "search_query"
@@ -73,20 +64,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupEdgeToEdge() {
-
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
-                val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-
-
-                toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = statusBarInsets.top
-                }
-
-
-
-                insets
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = statusBarInsets.top
             }
+            insets
         }
+    }
 
     private fun initViews() {
         toolbar = findViewById(R.id.toolbar)
@@ -142,12 +127,12 @@ class SearchActivity : AppCompatActivity() {
                     clearButton.isVisible = !s.isNullOrEmpty()
                     searchQuery = s?.toString() ?: ""
 
-                    currentSearchJob?.cancel()
+                    // Убрал корутины
+                    searchJob?.removeCallbacks(searchRunnable)
 
                     if (searchQuery.isNotEmpty()) {
-                        currentSearchJob = CoroutineScope(Dispatchers.Main).launch {
-                            delay(SEARCH_DELAY_MS)
-                            performSearch()
+                        searchJob = android.os.Handler(android.os.Looper.getMainLooper()).apply {
+                            postDelayed(searchRunnable, SEARCH_DELAY_MS)
                         }
                     } else {
                         showEmptyState()
@@ -179,22 +164,28 @@ class SearchActivity : AppCompatActivity() {
 
         showLoading()
 
-        CoroutineScope(Dispatchers.IO).launch {
+        Thread {
             try {
-                val response = RetrofitClient.api.searchTracks(searchQuery)
-                withContext(Dispatchers.Main) {
-                    if (response.resultCount > 0) {
-                        showSearchResults(response.results)
+                val call = RetrofitClient.api.searchTracks(searchQuery)
+                val response = call.execute()
+                runOnUiThread {
+                    if (response.isSuccessful && response.body() != null) {
+                        val trackResponse = response.body()!!
+                        if (trackResponse.resultCount > 0) {
+                            showSearchResults(trackResponse.results)
+                        } else {
+                            showNoResults()
+                        }
                     } else {
-                        showNoResults()
+                        showErrorState()
                     }
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+                runOnUiThread {
                     showErrorState()
                 }
             }
-        }
+        }.start()
     }
 
     private fun showLoading() {
@@ -208,7 +199,6 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         errorLayout.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
-
         adapter.updateTracks(tracks)
         recyclerView.visibility = View.VISIBLE
     }
@@ -217,9 +207,8 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         errorLayout.visibility = View.GONE
         recyclerView.visibility = View.GONE
-
         noResultsLayout.visibility = View.VISIBLE
-        noResultsText.text = getString(R.string.no_results_found) // Исправлено
+        noResultsText.text = getString(R.string.no_results_found)
 
         val noResultsDrawable = if (isDarkTheme()) {
             R.drawable.noinfdark
@@ -233,7 +222,6 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
-
         errorLayout.visibility = View.VISIBLE
         errorText.text = getString(R.string.connection_error)
 
@@ -253,13 +241,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun isDarkTheme(): Boolean {
-        return when (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) {
-            android.content.res.Configuration.UI_MODE_NIGHT_YES -> true
+        return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
     }
 
     private fun clearSearch() {
+        searchJob?.removeCallbacks(searchRunnable)
         searchEditText.apply {
             text.clear()
             clearFocus()
@@ -289,5 +278,9 @@ class SearchActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         outState.putString(SEARCH_QUERY_KEY, searchQuery)
     }
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
+        searchJob?.removeCallbacks(searchRunnable)
+    }
+}
