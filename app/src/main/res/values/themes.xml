@@ -12,7 +12,7 @@
         <item name="colorSecondary">@color/green_active</item>
         <item name="colorSurface">@color/green_active</item>
         <item name="colorPrimaryContainer">@color/YP_Black</item>
-        <item name="colorOnPrimaryContainer">@color/green_active</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
         <item name="android:textColor">@color/green_active</item>
 
 

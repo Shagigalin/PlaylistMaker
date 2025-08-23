@@ -110,7 +110,7 @@
             android:textFontWeight="500"
             android:textAllCaps="false"
             android:background="@drawable/button_rounded_bg"
-
+            app:backgroundTint="?attr/colorPrimaryContainer"
             android:textColor="?attr/colorOnPrimaryContainer"
             />
 
