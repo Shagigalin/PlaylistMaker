@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
@@ -41,6 +42,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noResultsImage: ImageView
     private lateinit var noResultsText: TextView
 
+    // Новые переменные для истории поиска
+    private lateinit var historyLayout: LinearLayout
+    private lateinit var historyRecyclerView: RecyclerView
+    private lateinit var clearHistoryButton: Button
+    private lateinit var historyTitle: TextView
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var historyAdapter: TrackAdapter
+
     private var searchQuery: String = ""
     private var searchJob: android.os.Handler? = null
     private val searchRunnable = Runnable { performSearch() }
@@ -55,12 +64,19 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        // Инициализация истории поиска
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        searchHistory = SearchHistory(prefs)
+
         setupEdgeToEdge()
         initViews()
         setupRecyclerView()
+        setupHistoryRecyclerView()
+        setupClearHistoryButton()
         setupToolbar()
         setupSearchEditText()
         restoreState(savedInstanceState)
+        showHistoryIfNeeded()
     }
 
     private fun setupEdgeToEdge() {
@@ -86,15 +102,42 @@ class SearchActivity : AppCompatActivity() {
         noResultsLayout = findViewById(R.id.noResultsLayout)
         noResultsImage = findViewById(R.id.noResultsImage)
         noResultsText = findViewById(R.id.noResultsText)
+
+        // Новые view для истории
+        historyLayout = findViewById(R.id.historyLayout)
+        historyRecyclerView = findViewById(R.id.history_recycler)
+        clearHistoryButton = findViewById(R.id.clear_history_button)
+        historyTitle = findViewById(R.id.history_title)
     }
 
     private fun setupRecyclerView() {
         adapter = TrackAdapter(emptyList()) { track ->
+            // Добавляем трек в историю при клике
+            searchHistory.addTrack(track)
             Toast.makeText(this, "Выбран: ${track.trackName}", Toast.LENGTH_SHORT).show()
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
+
+    private fun setupHistoryRecyclerView() {
+        historyAdapter = TrackAdapter(emptyList()) { track ->
+            // При клике на трек из истории добавляем его снова (перемещаем вверх)
+            searchHistory.addTrack(track)
+            searchEditText.setText(track.trackName)
+            performSearch()
+        }
+
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyRecyclerView.adapter = historyAdapter
+    }
+
+    private fun setupClearHistoryButton() {
+        clearHistoryButton.setOnClickListener {
+            searchHistory.clearHistory()
+            hideHistory()
+        }
     }
 
     private fun setupToolbar() {
@@ -127,7 +170,13 @@ class SearchActivity : AppCompatActivity() {
                     clearButton.isVisible = !s.isNullOrEmpty()
                     searchQuery = s?.toString() ?: ""
 
-                    // Убрал корутины
+                    // Показываем/скрываем историю в зависимости от текста
+                    if (searchQuery.isEmpty()) {
+                        showHistoryIfNeeded()
+                    } else {
+                        hideHistory()
+                    }
+
                     searchJob?.removeCallbacks(searchRunnable)
 
                     if (searchQuery.isNotEmpty()) {
@@ -144,6 +193,9 @@ class SearchActivity : AppCompatActivity() {
                 if (hasFocus && text.isNotEmpty()) {
                     clearButton.isVisible = true
                 }
+                if (hasFocus && text.isEmpty()) {
+                    showHistoryIfNeeded()
+                }
             }
         }
 
@@ -156,13 +208,36 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun showHistoryIfNeeded() {
+        if (searchHistory.hasHistory() && searchQuery.isEmpty()) {
+            val historyTracks = searchHistory.getHistory()
+            historyAdapter.updateTracks(historyTracks)
+            historyLayout.visibility = View.VISIBLE
+            hideAllSearchStates()
+        } else {
+            hideHistory()
+        }
+    }
+
+    private fun hideHistory() {
+        historyLayout.visibility = View.GONE
+    }
+
+    private fun hideAllSearchStates() {
+        progressBar.visibility = View.GONE
+        errorLayout.visibility = View.GONE
+        recyclerView.visibility = View.GONE
+        noResultsLayout.visibility = View.GONE
+    }
+
     private fun performSearch() {
         if (searchQuery.isEmpty()) {
-            showEmptyState()
+            showHistoryIfNeeded()
             return
         }
 
         showLoading()
+        hideHistory()
 
         Thread {
             try {
@@ -192,6 +267,7 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
         errorLayout.visibility = View.GONE
+        historyLayout.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
     }
 
@@ -199,6 +275,7 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         errorLayout.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
+        historyLayout.visibility = View.GONE
         adapter.updateTracks(tracks)
         recyclerView.visibility = View.VISIBLE
     }
@@ -207,6 +284,7 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         errorLayout.visibility = View.GONE
         recyclerView.visibility = View.GONE
+        historyLayout.visibility = View.GONE
         noResultsLayout.visibility = View.VISIBLE
         noResultsText.text = getString(R.string.no_results_found)
 
@@ -222,6 +300,7 @@ class SearchActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
+        historyLayout.visibility = View.GONE
         errorLayout.visibility = View.VISIBLE
         errorText.text = getString(R.string.connection_error)
 
@@ -238,6 +317,7 @@ class SearchActivity : AppCompatActivity() {
         errorLayout.visibility = View.GONE
         recyclerView.visibility = View.GONE
         noResultsLayout.visibility = View.GONE
+        showHistoryIfNeeded()
     }
 
     private fun isDarkTheme(): Boolean {
@@ -256,7 +336,7 @@ class SearchActivity : AppCompatActivity() {
         }
         clearButton.isVisible = false
         searchQuery = ""
-        showEmptyState()
+        showHistoryIfNeeded()
     }
 
     private fun hideKeyboard() {
@@ -270,7 +350,11 @@ class SearchActivity : AppCompatActivity() {
             searchEditText.setText(searchQuery)
             if (searchQuery.isNotEmpty()) {
                 performSearch()
+            } else {
+                showHistoryIfNeeded()
             }
+        } else {
+            showHistoryIfNeeded()
         }
     }
 

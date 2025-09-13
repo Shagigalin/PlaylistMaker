@@ -65,6 +65,7 @@ dependencies {
     // Network
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+    implementation("com.google.code.gson:gson:2.10.1")
 
 
 
