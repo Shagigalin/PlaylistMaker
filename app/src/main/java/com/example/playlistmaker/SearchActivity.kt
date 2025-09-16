@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : BaseActivity() {
 
     private lateinit var searchEditText: EditText
     private lateinit var clearButton: ImageView
@@ -320,12 +320,7 @@ class SearchActivity : AppCompatActivity() {
         showHistoryIfNeeded()
     }
 
-    private fun isDarkTheme(): Boolean {
-        return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> true
-            else -> false
-        }
-    }
+
 
     private fun clearSearch() {
         searchJob?.removeCallbacks(searchRunnable)

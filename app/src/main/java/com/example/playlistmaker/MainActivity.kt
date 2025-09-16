@@ -3,26 +3,22 @@ package com.example.playlistmaker
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.view.updatePadding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var buttonSearch: Button
     private lateinit var buttonMedia: Button
     private lateinit var buttonSettings: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         enableEdgeToEdge()
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         setupEdgeToEdge()
 
@@ -48,7 +44,6 @@ class MainActivity : AppCompatActivity() {
             val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
 
-            // Обновляем отступы для корневого View
             view.updatePadding(
                 top = statusBarInsets.top,
                 bottom = navigationBarInsets.bottom
