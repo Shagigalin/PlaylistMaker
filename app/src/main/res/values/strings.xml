@@ -60,4 +60,25 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Аудиоплеер -->
+
+    <string name="album_cover_description">Обложка альбома</string>
+
+    <!-- Кнопки управления -->
+    <string name="add_to_playlist_description">Добавить в плейлист</string>
+    <string name="play_pause_description">Воспроизвести или поставить на паузу</string>
+    <string name="add_to_favorites_description">Добавить в избранное</string>
+    <string name="back_button_description">Назад</string>
+
+    <!-- Информация о треке -->
+    <string name="duration">Длительность</string>
+    <string name="album">Альбом</string>
+    <string name="year">Год</string>
+    <string name="genre">Жанр</string>
+    <string name="country">Страна</string>
+
+    <!-- Состояния плеера -->
+    <string name="playing">Воспроизведение</string>
+    <string name="paused">Пауза</string>
 </resources>
