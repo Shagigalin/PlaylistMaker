@@ -2,42 +2,24 @@ package com.example.playlistmaker
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.core.view.updateLayoutParams
-import android.view.ViewGroup
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var sharedPrefs: SharedPreferences
-
-    companion object {
-        private const val PREFS_NAME = "theme_prefs"
-        private const val THEME_KEY = "current_theme"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Включаем Edge-to-Edge ДО setContentView()
         enableEdgeToEdge()
-
-        // Инициализация SharedPreferences
-        sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-
-        // Применение темы перед созданием активности
-        applyTheme(sharedPrefs.getBoolean(THEME_KEY, false))
-
         super.onCreate(savedInstanceState)
 
         // Инициализация View Binding
@@ -56,7 +38,6 @@ class SettingsActivity : AppCompatActivity() {
             val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
 
-            // Обновляем отступы для корневого View
             view.updatePadding(
                 top = statusBarInsets.top,
                 bottom = navigationBarInsets.bottom
@@ -64,16 +45,6 @@ class SettingsActivity : AppCompatActivity() {
 
             insets
         }
-
-        // Настраиваем кнопку назад для Edge-to-Edge
-
-    }
-
-
-
-    // Функция для конвертации dp в px
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun setupViews() {
@@ -112,12 +83,7 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
-    private fun applyTheme(isDark: Boolean) {
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
-    }
+
 
     private fun shareApp() {
         try {

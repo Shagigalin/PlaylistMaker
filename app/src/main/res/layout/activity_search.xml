@@ -18,12 +18,9 @@
         app:navigationIconTint="?attr/android:textColorPrimary"/>
 
     <!-- Поисковая строка -->
-
-    <!-- Progress Bar -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="54dp"
-
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
@@ -58,6 +55,56 @@
             android:visibility="gone" />
     </FrameLayout>
 
+    <!-- ИСТОРИЯ ПОИСКА - ДОБАВЛЯЕМ ЗДЕСЬ -->
+    <LinearLayout
+        android:id="@+id/historyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:padding="16dp">
+
+        <!-- Заголовок истории -->
+        <TextView
+            android:id="@+id/history_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search_history"
+            android:gravity="center"
+            android:textSize="19sp"
+            android:textFontWeight="500"
+            android:fontFamily="@font/ys_display_medium"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Список истории -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/history_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:listitem="@layout/item_track"/>
+
+        <!-- Кнопка очистки истории -->
+        <Button
+            android:id="@+id/clear_history_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/clear_history"
+            android:textSize="14sp"
+            android:textFontWeight="500"
+            android:fontFamily="@font/ys_display_medium"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/button_rounded_bg"
+            app:backgroundTint="?attr/colorPrimaryContainer"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
+    <!-- Progress Bar -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -73,16 +120,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:visibility="gone"
-
-        >
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/errorImage"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_marginBottom="16dp"
-            />
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/errorText"
@@ -96,12 +140,10 @@
             android:gravity="center"
             android:layout_marginBottom="24dp"
             android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-           />
+            android:paddingEnd="24dp"/>
 
         <Button
             android:id="@+id/retryButton"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/retry"
@@ -111,8 +153,7 @@
             android:textAllCaps="false"
             android:background="@drawable/button_rounded_bg"
             app:backgroundTint="?attr/colorPrimaryContainer"
-            android:textColor="?attr/colorOnPrimaryContainer"
-            />
+            android:textColor="?attr/colorOnPrimaryContainer"/>
 
     </LinearLayout>
 
@@ -129,8 +170,7 @@
             android:id="@+id/noResultsImage"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_marginBottom="16dp"
-            />
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/noResultsText"
@@ -145,12 +185,11 @@
 
     </LinearLayout>
 
-    <!-- RecyclerView -->
+    <!-- RecyclerView результатов поиска -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_results_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:clipToPadding="false"
         android:padding="8dp"
         android:visibility="gone"
