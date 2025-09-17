@@ -24,49 +24,63 @@
                 android:background="?attr/selectableItemBackground"
                 android:drawableStart="@drawable/strel"
                 android:drawablePadding="8dp"
-                android:drawableTint="?attr/android:textColorPrimary"
+                android:drawableTint="?android:attr/textColorPrimary"
                 android:minHeight="48dp"
                 android:padding="8dp" />
 
         </LinearLayout>
 
         <!-- Обложка -->
-        <ImageView
-            android:id="@+id/album_cover"
-            android:layout_width="312dp"
-            android:layout_height="312dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="26dp"
-            android:background="?attr/colorSurfaceVariant"
-            android:contentDescription="@string/album_cover_description"
-            android:scaleType="centerCrop"
-            android:src="@drawable/placeholder" />
-
-        <!-- Название трека -->
-        <TextView
-            android:id="@+id/track_name"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnSurface"
-            android:textFontWeight="400"
-            android:textSize="22sp"
-            tools:text="Название трека" />
+            android:orientation="vertical">
 
-        <!-- Имя исполнителя -->
-        <TextView
-            android:id="@+id/artist_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnSurface"
-            android:textFontWeight="400"
-            android:textSize="14sp"
-            tools:text="Исполнитель" />
+            <ImageView
+                android:id="@+id/album_cover"
+                android:layout_width="312dp"
+                android:layout_height="312dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="26dp"
+                android:background="@drawable/rounded_corners"
+                android:contentDescription="@string/album_cover_description"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder"
+                android:clipToOutline="true"/>
+
+            <!-- Название трека -->
+            <TextView
+                android:id="@+id/track_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/album_cover"
+                app:layout_constraintEnd_toEndOf="@id/album_cover"
+                app:layout_constraintTop_toBottomOf="@id/album_cover"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/ys_display_medium"
+                android:textAlignment="viewStart"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="22sp"
+                tools:text="Название трека" />
+
+            <!-- Имя исполнителя -->
+            <TextView
+                android:id="@+id/artist_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/album_cover"
+                app:layout_constraintEnd_toEndOf="@id/album_cover"
+                app:layout_constraintTop_toBottomOf="@id/track_name"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/ys_display_medium"
+                android:textAlignment="viewStart"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp"
+                tools:text="Исполнитель" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Кнопки управления -->
         <LinearLayout
@@ -97,9 +111,11 @@
                 android:id="@+id/btn_play_pause"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="?attr/colorPrimary"
+                android:background="@android:color/transparent"
                 android:contentDescription="@string/play_pause_description"
-                android:src="@drawable/play" />
+                android:src="@drawable/play"
+
+                />
 
             <!-- Пробел -->
             <Space
@@ -127,8 +143,7 @@
             android:layout_marginTop="4dp"
             android:fontFamily="@font/ys_display_medium"
             android:textAlignment="center"
-            android:textColor="?attr/colorOnSurface"
-            android:textFontWeight="500"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp"
             tools:text="--:--" />
 
@@ -139,7 +154,7 @@
             android:layout_marginTop="30dp"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingBottom="24dp"> <!-- Добавлен отступ снизу -->
+            android:paddingBottom="24dp">
 
             <!-- Длительность -->
             <LinearLayout
@@ -153,8 +168,7 @@
                     android:layout_width="124dp"
                     android:layout_height="wrap_content"
                     android:text="@string/duration"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?attr/colorSurfaceVariant"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"/>
 
@@ -165,8 +179,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:lines="1"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"
                     tools:text="3:45" />
@@ -185,8 +198,7 @@
                     android:layout_width="124dp"
                     android:layout_height="wrap_content"
                     android:text="@string/album"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?attr/colorSurfaceVariant"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular" />
 
@@ -197,8 +209,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:lines="1"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"
                     tools:text="Название альбома" />
@@ -217,8 +228,7 @@
                     android:layout_width="124dp"
                     android:layout_height="wrap_content"
                     android:text="@string/year"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?attr/colorSurfaceVariant"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular" />
 
@@ -229,8 +239,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:lines="1"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"
                     tools:text="2023" />
@@ -249,8 +258,7 @@
                     android:layout_width="124dp"
                     android:layout_height="wrap_content"
                     android:text="@string/genre"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?attr/colorSurfaceVariant"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular" />
 
@@ -261,8 +269,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:lines="1"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"
                     tools:text="Pop" />
@@ -281,8 +288,7 @@
                     android:layout_width="124dp"
                     android:layout_height="wrap_content"
                     android:text="@string/country"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?attr/colorSurfaceVariant"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular" />
 
@@ -293,8 +299,7 @@
                     android:layout_weight="1"
                     android:gravity="end"
                     android:lines="1"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textFontWeight="400"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="13sp"
                     android:fontFamily="@font/ys_display_regular"
                     tools:text="USA" />

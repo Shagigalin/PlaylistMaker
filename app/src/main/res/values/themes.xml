@@ -16,6 +16,11 @@
         <item name="android:textColor">@color/green_active</item>
 
 
+        <item name="colorSurfaceVariant">@color/YP_Text_Gray</item>
+
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">@color/transparent_bg_25_light</item>
+
 
 
 

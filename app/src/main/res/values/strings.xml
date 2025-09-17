@@ -70,6 +70,8 @@
     <string name="play_pause_description">Воспроизвести или поставить на паузу</string>
     <string name="add_to_favorites_description">Добавить в избранное</string>
     <string name="back_button_description">Назад</string>
+    <string name="unknown">Неизвестно</string>
+
 
     <!-- Информация о треке -->
     <string name="duration">Длительность</string>
