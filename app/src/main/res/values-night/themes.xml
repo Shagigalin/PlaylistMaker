@@ -21,6 +21,9 @@
         <item name="android:navigationBarColor">@color/transparent_bg_25_light</item>
 
 
+        <item name="colorOnContainer">@color/izbr_b</item>
+
+
 
 
 

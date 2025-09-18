@@ -83,13 +83,10 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Кнопки управления -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_marginTop="30dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginTop="30dp">
 
             <!-- Левая кнопка -->
             <ImageButton
@@ -97,32 +94,25 @@
                 android:layout_width="51dp"
                 android:layout_height="51dp"
                 android:layout_marginStart="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="#00FFFFFF"
                 android:contentDescription="@string/add_to_playlist_description"
-                android:src="@drawable/plus" />
-
-            <!-- Пробел -->
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:src="@drawable/plus"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Центральная кнопка -->
             <ImageButton
                 android:id="@+id/btn_play_pause"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:background="@android:color/transparent"
+                android:background="?attr/colorOnPrimary"
                 android:contentDescription="@string/play_pause_description"
                 android:src="@drawable/play"
-
-                />
-
-            <!-- Пробел -->
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Правая кнопка -->
             <ImageButton
@@ -130,11 +120,14 @@
                 android:layout_width="51dp"
                 android:layout_height="51dp"
                 android:layout_marginEnd="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="#00FFFFFF"
                 android:contentDescription="@string/add_to_favorites_description"
-                android:src="@drawable/izbran" />
+                android:src="@drawable/izbran"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Таймер -->
         <TextView
