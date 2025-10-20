@@ -15,6 +15,15 @@
         <item name="colorOnPrimaryContainer">@color/YP_Black</item>
         <item name="android:textColor">@color/white</item>
 
+        <item name="colorSurfaceVariant">@color/YP_Text_Gray</item>
+
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">@color/transparent_bg_25_light</item>
+
+
+        <item name="colorOnContainer">@color/izbr_b</item>
+
+
 
 
 

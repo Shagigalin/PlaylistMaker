@@ -9,7 +9,14 @@
     <color name="green_active_transparent">#9FBBF3</color>
     <color name="gray_inactive_transparent">#9FBBF3</color>
     <color name="poisk">#1A1B22</color>
-    <color name="YP_Black">#1A1B22</color>
 
+    <color name="YP_Black">#1A1B22</color>
+    <color name="YP_Text_Gray">#AEAFB4</color>
+    <color name="YP_White">#FFFFFF</color>
+    <color name="plus_icon">#1A1B2240</color>
+    <color name="transparent_bg_25_light">#40FFFFFF</color>
+
+    <color name="izbr_w">#401A1B22</color>
+    <color name="izbr_b">#40FFFFFF</color>
 
 </resources>

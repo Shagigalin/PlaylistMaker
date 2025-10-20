@@ -1,3 +1,7 @@
+package com.example.playlistmaker
+
+import java.io.Serializable
+
 data class Track(
     val trackId: Long,
     val trackName: String,
@@ -6,8 +10,9 @@ data class Track(
     val artworkUrl100: String,
     val collectionName: String?,
     val releaseDate: String?,
-    val primaryGenreName: String?
-) : java.io.Serializable {
+    val primaryGenreName: String?,
+    val country: String? // Добавляем поле country
+) : Serializable {
 
     fun getFormattedTime(): String {
         return if (trackTimeMillis > 0) {
@@ -17,6 +22,20 @@ data class Track(
         } else {
             "--:--"
         }
+    }
+
+    // Функция для получения обложки высокого качества
+    fun getCoverArtwork(): String {
+        return if (artworkUrl100.isNotEmpty()) {
+            artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
+        } else {
+            ""
+        }
+    }
+
+    // Функция для получения года из releaseDate
+    fun getReleaseYear(): String? {
+        return releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
     }
 
     override fun equals(other: Any?): Boolean {
