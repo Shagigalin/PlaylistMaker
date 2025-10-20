@@ -2,6 +2,8 @@ package com.example.playlistmaker
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -39,19 +41,39 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noResultsLayout: LinearLayout
     private lateinit var retryButton: Button
 
-    private val adapter = TrackAdapter(emptyList()) { track ->
-        // Сохраняем трек в историю
-        searchHistory.addTrack(track)
+    private val searchHandler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+    private val SEARCH_DEBOUNCE_DELAY = 2000L // 2 секунды
 
-        val intent = Intent(this@SearchActivity, MediaActivity::class.java)
-        intent.putExtra("track", track)
-        startActivity(intent)
+    // Debounce для кликов по трекам
+    private var lastClickTime = 0L
+    private val CLICK_DEBOUNCE_DELAY = 1000L // 1 секунда
+
+    private val adapter = TrackAdapter(emptyList()) { track ->
+        // Debounce для кликов
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
+            lastClickTime = currentTime
+
+            // Сохраняем трек в историю
+            searchHistory.addTrack(track)
+
+            val intent = Intent(this@SearchActivity, MediaActivity::class.java)
+            intent.putExtra("track", track)
+            startActivity(intent)
+        }
     }
 
     private val historyAdapter = TrackAdapter(emptyList()) { track ->
-        val intent = Intent(this@SearchActivity, MediaActivity::class.java)
-        intent.putExtra("track", track)
-        startActivity(intent)
+        // Debounce для кликов в истории
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
+            lastClickTime = currentTime
+
+            val intent = Intent(this@SearchActivity, MediaActivity::class.java)
+            intent.putExtra("track", track)
+            startActivity(intent)
+        }
     }
 
     private lateinit var searchHistory: SearchHistory
@@ -107,11 +129,22 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
+                // Отменяем предыдущий поиск
+                searchRunnable?.let { searchHandler.removeCallbacks(it) }
+
                 if (s.isNullOrEmpty()) {
                     showHistory()
                 } else {
                     hideHistory()
-                    performSearch(s.toString())
+
+                    // Показываем ProgressBar при начале ввода
+                    showLoading()
+
+                    // Создаем новый поиск с debounce
+                    searchRunnable = Runnable {
+                        performSearch(s.toString())
+                    }
+                    searchRunnable?.let { searchHandler.removeCallbacks(it) }
                 }
             }
         })
@@ -154,18 +187,29 @@ class SearchActivity : AppCompatActivity() {
         if (query.isEmpty()) return
 
         showLoading()
+        println("Starting search for: $query") // Отладочное сообщение
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(iTunesApi.BASE_URL) // Используем константу из companion object
+            .baseUrl(iTunesApi.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val iTunesService = retrofit.create(iTunesApi::class.java)
-        iTunesService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
+
+        iTunesService.searchTracks(query, "song", 50).enqueue(object : Callback<TrackResponse> {
             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
                 hideLoading()
+                println("Search response: ${response.code()}") // Отладочное сообщение
+
                 if (response.isSuccessful) {
                     val tracks = response.body()?.results ?: emptyList()
+                    println("Found ${tracks.size} tracks") // Отладочное сообщение
+
+                    // Выведем информацию о первых треках для отладки
+                    tracks.take(3).forEach { track ->
+                        println("Track: ${track.trackName} by ${track.artistName}, preview: ${track.previewUrl}")
+                    }
+
                     if (tracks.isNotEmpty()) {
                         showTracks(tracks)
                     } else {
@@ -173,12 +217,15 @@ class SearchActivity : AppCompatActivity() {
                     }
                 } else {
                     showError()
+                    println("Search error: ${response.code()} - ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                 hideLoading()
                 showError()
+                println("Search failure: ${t.message}")
+                t.printStackTrace()
             }
         })
     }
@@ -242,5 +289,11 @@ class SearchActivity : AppCompatActivity() {
 
             insets
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Очищаем handler при уничтожении Activity
+        searchHandler.removeCallbacksAndMessages(null)
     }
 }
