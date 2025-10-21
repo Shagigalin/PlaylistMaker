@@ -8,8 +8,8 @@ interface iTunesApi {
     @GET("search")
     fun searchTracks(
         @Query("term") term: String,
-        @Query("entity") entity: String = "song",
-        @Query("limit") limit: Int = 50
+        @Query("media") media: String = "music",
+        @Query("entity") entity: String = "song"
     ): Call<TrackResponse>
 
     companion object {
