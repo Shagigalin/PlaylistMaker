@@ -111,7 +111,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="100dp"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:indeterminateTint="@color/progress_tint"/>
 
     <!-- Layout ошибки -->
     <LinearLayout
