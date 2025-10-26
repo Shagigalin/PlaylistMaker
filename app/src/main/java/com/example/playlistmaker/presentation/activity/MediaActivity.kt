@@ -1,14 +1,15 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.activity
 
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.bumptech.glide.Glide
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.model.Track
 import java.io.IOException
 
 class MediaActivity : AppCompatActivity() {
@@ -227,7 +230,7 @@ class MediaActivity : AppCompatActivity() {
 
     private fun showError(message: String) {
 
-        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun setupEdgeToEdge() {
@@ -246,7 +249,7 @@ class MediaActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun getTrackFromIntent(): Track? {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("track", Track::class.java)
         } else {
             intent.getSerializableExtra("track") as? Track
