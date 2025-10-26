@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.activity
 
-import com.example.playlistmaker.R
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +11,7 @@ import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : BaseActivity() {

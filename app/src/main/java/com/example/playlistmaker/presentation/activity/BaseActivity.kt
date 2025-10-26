@@ -9,10 +9,7 @@ open class BaseActivity : AppCompatActivity() {
 
     protected lateinit var sharedPrefs: SharedPreferences
 
-    companion object {
-        const val PREFS_NAME = "theme_prefs"
-        const val THEME_KEY = "current_theme"
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Инициализация SharedPreferences
@@ -33,5 +30,10 @@ open class BaseActivity : AppCompatActivity() {
 
     protected fun isDarkTheme(): Boolean {
         return sharedPrefs.getBoolean(THEME_KEY, false)
+    }
+
+    companion object {
+        const val PREFS_NAME = "theme_prefs"
+        const val THEME_KEY = "current_theme"
     }
 }

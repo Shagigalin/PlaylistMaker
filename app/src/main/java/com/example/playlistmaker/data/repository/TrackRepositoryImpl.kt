@@ -14,8 +14,7 @@ class TrackRepositoryImpl : TrackRepository {
     }
 
     override suspend fun searchTracks(query: String): List<Track> {
-        return withContext(Dispatchers.IO) {
-            try {
+        return try {
                 val response = iTunesService.searchTracks(query).execute()
                 if (response.isSuccessful) {
                     response.body()?.results?.map { it.toTrack() } ?: emptyList()
@@ -27,4 +26,3 @@ class TrackRepositoryImpl : TrackRepository {
             }
         }
     }
-}

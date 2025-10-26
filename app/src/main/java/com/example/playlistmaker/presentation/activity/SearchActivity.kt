@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -23,8 +22,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.usecase.AddToSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.ClearSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.GetSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.SearchTracksUseCaseInterface
 import com.example.playlistmaker.presentation.adapter.TrackAdapter
-import com.example.playlistmaker.presentation.di.Creator
+import com.example.playlistmaker.data.di.Creator
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,10 +56,10 @@ class SearchActivity : AppCompatActivity() {
     private val CLICK_DEBOUNCE_DELAY = 1000L
 
     // Use Cases
-    private lateinit var searchTracksUseCase: com.example.playlistmaker.domain.usecase.SearchTracksUseCase
-    private lateinit var getSearchHistoryUseCase: com.example.playlistmaker.domain.usecase.GetSearchHistoryUseCase
-    private lateinit var addToSearchHistoryUseCase: com.example.playlistmaker.domain.usecase.AddToSearchHistoryUseCase
-    private lateinit var clearSearchHistoryUseCase: com.example.playlistmaker.domain.usecase.ClearSearchHistoryUseCase
+    private lateinit var searchTracksUseCase: SearchTracksUseCaseInterface
+    private lateinit var getSearchHistoryUseCase: GetSearchHistoryUseCaseInterface
+    private lateinit var addToSearchHistoryUseCase: AddToSearchHistoryUseCaseInterface
+    private lateinit var clearSearchHistoryUseCase: ClearSearchHistoryUseCaseInterface
 
     private val adapter = TrackAdapter(emptyList()) { track ->
         val currentTime = System.currentTimeMillis()

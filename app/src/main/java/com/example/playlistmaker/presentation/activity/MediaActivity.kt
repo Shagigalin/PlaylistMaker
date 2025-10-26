@@ -44,9 +44,7 @@ class MediaActivity : AppCompatActivity() {
     private var isPrepared = false
     private var currentPosition = 0
 
-    private companion object {
-        const val UPDATE_INTERVAL = 100L // 100 ms
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -308,5 +306,9 @@ class MediaActivity : AppCompatActivity() {
         mediaPlayer?.release()
         mediaPlayer = null
         progressHandler?.removeCallbacksAndMessages(null)
+    }
+
+    private companion object {
+        const val UPDATE_INTERVAL = 100L // 100 ms
     }
 }
