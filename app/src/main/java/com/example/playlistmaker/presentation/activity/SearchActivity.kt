@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,14 +6,12 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -22,12 +20,19 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.R
+import com.example.playlistmaker.domain.model.Track
+import com.example.playlistmaker.domain.usecase.AddToSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.ClearSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.GetSearchHistoryUseCaseInterface
+import com.example.playlistmaker.domain.usecase.SearchTracksUseCaseInterface
+import com.example.playlistmaker.presentation.adapter.TrackAdapter
+import com.example.playlistmaker.data.di.Creator
 import com.google.android.material.appbar.MaterialToolbar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
 
@@ -50,11 +55,17 @@ class SearchActivity : AppCompatActivity() {
     private var lastClickTime = 0L
     private val CLICK_DEBOUNCE_DELAY = 1000L
 
+    // Use Cases
+    private lateinit var searchTracksUseCase: SearchTracksUseCaseInterface
+    private lateinit var getSearchHistoryUseCase: GetSearchHistoryUseCaseInterface
+    private lateinit var addToSearchHistoryUseCase: AddToSearchHistoryUseCaseInterface
+    private lateinit var clearSearchHistoryUseCase: ClearSearchHistoryUseCaseInterface
+
     private val adapter = TrackAdapter(emptyList()) { track ->
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
             lastClickTime = currentTime
-            searchHistory.addTrack(track)
+            addToSearchHistoryUseCase.execute(track)
             val intent = Intent(this@SearchActivity, MediaActivity::class.java)
             intent.putExtra("track", track)
             startActivity(intent)
@@ -71,21 +82,27 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var searchHistory: SearchHistory
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        // Инициализация Use Cases через Creator
+        initUseCases()
+
         setupEdgeToEdge()
         initViews()
         setupToolbar()
-        setupSearchHistory()
         setupSearchField()
         setupErrorHandling()
         showHistory()
+    }
 
+    private fun initUseCases() {
+        searchTracksUseCase = Creator.provideSearchTracksUseCase()
+        getSearchHistoryUseCase = Creator.provideGetSearchHistoryUseCase(this)
+        addToSearchHistoryUseCase = Creator.provideAddToSearchHistoryUseCase(this)
+        clearSearchHistoryUseCase = Creator.provideClearSearchHistoryUseCase(this)
     }
 
     private fun initViews() {
@@ -108,21 +125,15 @@ class SearchActivity : AppCompatActivity() {
         historyRecycler.adapter = historyAdapter
 
         clearHistoryButton.setOnClickListener {
-            searchHistory.clearHistory()
+            clearSearchHistoryUseCase.execute()
             showHistory()
         }
     }
 
     private fun setupToolbar() {
         toolbar.setNavigationOnClickListener {
-
             finish()
         }
-    }
-
-    private fun setupSearchHistory() {
-        val sharedPreferences = getSharedPreferences("search_prefs", MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPreferences)
     }
 
     private fun setupSearchField() {
@@ -134,7 +145,6 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                // Отменяем предыдущий поиск
                 searchRunnable?.let { searchHandler.removeCallbacks(it) }
 
                 if (s.isNullOrEmpty()) {
@@ -142,7 +152,6 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     hideHistory()
 
-                    // Создаем новый поиск с debounce
                     searchRunnable = Runnable {
                         performSearch(s.toString())
                     }
@@ -174,34 +183,20 @@ class SearchActivity : AppCompatActivity() {
 
         showLoading()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://itunes.apple.com/") // Прямо указываем URL
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val iTunesService = retrofit.create(iTunesApi::class.java)
-
-        // Выполняем поиск
-        iTunesService.searchTracks(query).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                hideLoading()
-                if (response.isSuccessful && response.body() != null) {
-                    val tracks = response.body()!!.results
-                    if (tracks.isNotEmpty()) {
-                        showTracks(tracks)
-                    } else {
-                        showNoResults()
-                    }
-                } else {
-                    showError()
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val tracks = withContext(Dispatchers.IO) {
+                    searchTracksUseCase.execute(query)
                 }
-            }
-
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                hideLoading()
+                if (tracks.isNotEmpty()) {
+                    showTracks(tracks)
+                } else {
+                    showNoResults()
+                }
+            } catch (e: Exception) {
                 showError()
             }
-        })
+        }
     }
 
     private fun showLoading() {
@@ -225,7 +220,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        val history = searchHistory.getHistory()
+        val history = getSearchHistoryUseCase.execute()
         if (history.isNotEmpty()) {
             historyLayout.isVisible = true
             searchResultsRecycler.isVisible = false

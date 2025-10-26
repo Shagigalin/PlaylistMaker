@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.activity
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -11,6 +11,7 @@ import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : BaseActivity() {
@@ -34,7 +35,7 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun setupEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
             val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
 
@@ -74,7 +75,7 @@ class SettingsActivity : BaseActivity() {
 
     private fun updateThemeIcon() {
         val isDarkTheme = sharedPrefs.getBoolean(THEME_KEY, false)
-        val iconRes = if (isDarkTheme) R.drawable.on else R.drawable.off
+        val iconRes = if (isDarkTheme) com.example.playlistmaker.R.drawable.on else com.example.playlistmaker.R.drawable.off
         binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
             null,
             null,
@@ -87,14 +88,13 @@ class SettingsActivity : BaseActivity() {
 
     private fun shareApp() {
         try {
-            Intent.createChooser(
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT,
-                        getString(R.string.share_course_text, getString(R.string.android_course_url)))
-                },
-                getString(R.string.share_dialog_title)
-            ).also { startActivity(it) }
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_course_text, getString(R.string.android_course_url)))
+            }
+
+            val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share_dialog_title))
+            startActivity(chooserIntent)
         } catch (e: ActivityNotFoundException) {
             showToast(R.string.no_apps_found)
         }
@@ -102,12 +102,12 @@ class SettingsActivity : BaseActivity() {
 
     private fun contactSupport() {
         try {
-            Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:")
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
+            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:${getString(R.string.support_email)}")
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))
-            }.also { startActivity(it) }
+            }
+            startActivity(emailIntent)
         } catch (e: ActivityNotFoundException) {
             showToast(R.string.no_email_client)
         }
@@ -115,10 +115,10 @@ class SettingsActivity : BaseActivity() {
 
     private fun openTerms() {
         try {
-            Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.terms_url)))
+            Intent(Intent.ACTION_VIEW, Uri.parse(getString(com.example.playlistmaker.R.string.terms_url)))
                 .also { startActivity(it) }
         } catch (e: ActivityNotFoundException) {
-            showToast(R.string.no_browser_found)
+            showToast(com.example.playlistmaker.R.string.no_browser_found)
         }
     }
 
