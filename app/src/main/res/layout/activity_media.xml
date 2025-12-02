@@ -51,6 +51,18 @@
                 android:src="@drawable/placeholder"
                 android:clipToOutline="true"/>
 
+            <!-- ProgressBar для загрузки аудио -->
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:visibility="gone"
+                android:indeterminateTint="?attr/colorPrimary"
+                app:layout_constraintTop_toTopOf="@id/album_cover"
+                app:layout_constraintBottom_toBottomOf="@id/album_cover"
+                app:layout_constraintStart_toStartOf="@id/album_cover"
+                app:layout_constraintEnd_toEndOf="@id/album_cover"/>
+
             <!-- Название трека -->
             <TextView
                 android:id="@+id/track_name"
@@ -129,7 +141,30 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Таймер -->
+        <!-- Прогресс воспроизведения -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="16dp">
+
+            <!-- Текущее время -->
+            <TextView
+                android:id="@+id/currentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="@font/ys_display_regular"/>
+
+
+
+        </LinearLayout>
+
+        <!-- Таймер  -->
         <TextView
             android:id="@+id/timer_text"
             android:layout_width="match_parent"
@@ -139,6 +174,7 @@
             android:textAlignment="center"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp"
+            android:visibility="gone"
             tools:text="--:--" />
 
         <!-- Информация о треке -->
