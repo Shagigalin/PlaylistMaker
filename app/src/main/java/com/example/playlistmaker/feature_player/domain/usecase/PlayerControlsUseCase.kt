@@ -4,12 +4,13 @@ import android.media.MediaPlayer
 import com.example.playlistmaker.feature_player.domain.model.PlayerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import java.io.IOException
 
 class PlayerControlsUseCase {
 
     private var mediaPlayer: MediaPlayer? = null
-    private val _playerState = MutableStateFlow(PlayerState())
+    private val _playerState = MutableStateFlow(PlayerState(isLoading = false))
     val playerState: StateFlow<PlayerState> = _playerState
 
     fun prepareMediaPlayer(previewUrl: String) {
@@ -17,40 +18,60 @@ class PlayerControlsUseCase {
 
         mediaPlayer = MediaPlayer().apply {
             setOnPreparedListener {
-                _playerState.value = _playerState.value.copy(
-                    isPrepared = true,
-                    duration = duration
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        isPrepared = true,
+                        duration = duration
+                    )
+                }
             }
 
             setOnCompletionListener {
-                _playerState.value = _playerState.value.copy(
-                    isPlaying = false,
-                    currentPosition = 0
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        isPlaying = false,
+                        currentPosition = 0
+                    )
+                }
             }
 
             setOnErrorListener { _, what, extra ->
-                _playerState.value = _playerState.value.copy(
-                    error = "Playback error: $what, $extra",
-                    isPlaying = false
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        error = "Playback error: $what, $extra",
+                        isPlaying = false
+                    )
+                }
                 false
             }
 
             try {
                 setDataSource(previewUrl)
                 prepareAsync()
+
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        isPrepared = false,
+                        isLoading = true,
+                        error = null
+                    )
+                }
             } catch (e: IOException) {
-                _playerState.value = _playerState.value.copy(
-                    error = "Failed to load audio: ${e.message}",
-                    isPrepared = false
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        error = "Failed to load audio: ${e.message}",
+                        isPrepared = false,
+                        isLoading = false
+                    )
+                }
             } catch (e: IllegalStateException) {
-                _playerState.value = _playerState.value.copy(
-                    error = "Player in illegal state",
-                    isPrepared = false
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        error = "Player in illegal state",
+                        isPrepared = false,
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -59,9 +80,11 @@ class PlayerControlsUseCase {
         mediaPlayer?.let { player ->
             if (!player.isPlaying) {
                 player.start()
-                _playerState.value = _playerState.value.copy(
-                    isPlaying = true
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        isPlaying = true
+                    )
+                }
             }
         }
     }
@@ -71,25 +94,29 @@ class PlayerControlsUseCase {
             if (player.isPlaying) {
                 player.pause()
                 val currentPosition = player.currentPosition
-                _playerState.value = _playerState.value.copy(
-                    isPlaying = false,
-                    currentPosition = currentPosition
-                )
+                _playerState.update { currentState ->
+                    currentState.copy(
+                        isPlaying = false,
+                        currentPosition = currentPosition
+                    )
+                }
             }
         }
     }
 
     fun seekTo(position: Int) {
         mediaPlayer?.seekTo(position)
-        _playerState.value = _playerState.value.copy(
-            currentPosition = position
-        )
+        _playerState.update { currentState ->
+            currentState.copy(
+                currentPosition = position
+            )
+        }
     }
 
     fun release() {
         mediaPlayer?.release()
         mediaPlayer = null
-        _playerState.value = PlayerState()
+        _playerState.value = PlayerState(isLoading = false)
     }
 
     fun getCurrentPosition(): Int {

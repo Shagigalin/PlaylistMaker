@@ -37,7 +37,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        println("DEBUG: SearchActivity onCreate")
+
 
         enableEdgeToEdge()
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -47,6 +47,14 @@ class SearchActivity : AppCompatActivity() {
         setupAdapters()
         setupViews()
         setupObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val query = binding.searchEditText.text.toString()
+        if (query.isEmpty()) {
+                       viewModel.showHistory()
+        }
     }
 
     private fun setupEdgeToEdge() {
@@ -80,12 +88,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        // Toolbar navigation
+
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
-        // Search field
+
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -95,7 +103,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 val query = s?.toString()?.trim() ?: ""
-                println("DEBUG: Text changed to: '$query'")
+
                 viewModel.search(query)
             }
         })
@@ -106,12 +114,12 @@ class SearchActivity : AppCompatActivity() {
             viewModel.showHistory()
         }
 
-        // Clear history button
+
         binding.clearHistoryButton.setOnClickListener {
             viewModel.clearHistory()
         }
 
-        // Retry button
+
         binding.retryButton.setOnClickListener {
             val query = binding.searchEditText.text.toString().trim()
             if (query.isNotEmpty()) {
@@ -121,32 +129,51 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        println("DEBUG: Setting up observers")
+
+
+
         viewModel.state.observe(this) { state ->
-            println("DEBUG: State changed: isLoading=${state.isLoading}, tracks=${state.tracks.size}")
+
             updateUI(state)
+        }
+
+
+        viewModel.event.observe(this) { event ->
+            event?.let {
+
+                it.errorMessage?.let { message ->
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+
+
+                it.navigateToPlayer?.let { track ->
+                    val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                    intent.putExtra("track", track)
+                    startActivity(intent)
+                }
+            }
         }
     }
 
     private fun updateUI(state: SearchState) {
-        // Progress bar
+
         binding.progressBar.isVisible = state.isLoading
 
-        // History layout
+
         binding.historyLayout.isVisible = state.isHistoryVisible
         binding.clearHistoryButton.isVisible = state.isHistoryVisible && state.history.isNotEmpty()
 
-        // Search results
+
         binding.searchResultsRecycler.isVisible =
             state.isSearching && !state.isLoading && !state.isNoResults
 
-        // Error layout
+
         binding.errorLayout.isVisible = state.isError
 
-        // No results layout
+
         binding.noResultsLayout.isVisible = state.isNoResults
 
-        // Update adapters
+
         if (state.isSearching) {
             searchAdapter.updateTracks(state.tracks)
         }
@@ -155,10 +182,7 @@ class SearchActivity : AppCompatActivity() {
             historyAdapter.updateTracks(state.history)
         }
 
-        // Show error message
-        state.errorMessage?.let {
-            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-        }
+
     }
 
     private fun onTrackClick(track: Track) {
@@ -166,13 +190,17 @@ class SearchActivity : AppCompatActivity() {
         if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
             lastClickTime = currentTime
 
+            // Добавляем в историю
             viewModel.addToHistory(track)
 
+            // Открываем плеер
             val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
             intent.putExtra("track", track)
             startActivity(intent)
         }
     }
+
+
 
     private fun hideKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

@@ -19,3 +19,8 @@ data class SearchState(
         )
     }
 }
+
+data class SearchEvent(
+    val errorMessage: String? = null,
+    val navigateToPlayer: Track? = null
+)

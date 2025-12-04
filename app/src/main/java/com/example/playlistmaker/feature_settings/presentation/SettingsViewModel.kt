@@ -17,7 +17,7 @@ class SettingsViewModel(
     private val _state = MutableLiveData<SettingsState>()
     val state: LiveData<SettingsState> = _state
 
-    // LiveData для управления пересозданием Activity
+
     private val _shouldRecreate = MutableLiveData<Boolean>()
     val shouldRecreate: LiveData<Boolean> = _shouldRecreate
 

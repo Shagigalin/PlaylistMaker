@@ -5,5 +5,6 @@ data class PlayerState(
     val currentPosition: Int = 0,
     val duration: Int = 0,
     val isPrepared: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isLoading: Boolean
 )

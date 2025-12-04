@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.core.utils.SingleLiveEvent
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.usecase.*
 import kotlinx.coroutines.Job
@@ -19,6 +20,10 @@ class SearchViewModel(
 
     private val _state = MutableLiveData<SearchState>(SearchState.Initial)
     val state: LiveData<SearchState> = _state
+
+
+    private val _event = SingleLiveEvent<SearchEvent>()
+    val event: LiveData<SearchEvent> = _event
 
     private var searchJob: Job? = null
     private val SEARCH_DEBOUNCE_DELAY = 1000L
@@ -43,8 +48,7 @@ class SearchViewModel(
             isSearching = true,
             isHistoryVisible = false,
             isError = false,
-            isNoResults = false,
-            errorMessage = null
+            isNoResults = false
         )
 
         searchJob = viewModelScope.launch {
@@ -68,12 +72,15 @@ class SearchViewModel(
         } catch (e: Exception) {
             println("DEBUG: Search error: ${e.message}")
             e.printStackTrace()
+
             _state.postValue(_state.value?.copy(
                 isLoading = false,
                 isError = true,
-                isSearching = false,
-                errorMessage = "Ошибка: ${e.localizedMessage}"
+                isSearching = false
             ))
+
+
+            _event.postValue(SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}"))
         }
     }
 
@@ -106,5 +113,21 @@ class SearchViewModel(
             history = history,
             isHistoryVisible = history.isNotEmpty()
         ) ?: SearchState(history = history, isHistoryVisible = history.isNotEmpty())
+    }
+
+    fun restoreSearchState(query: String, tracks: List<Track>) {
+        _state.value = SearchState(
+            query = query,
+            tracks = tracks,
+            isSearching = tracks.isNotEmpty(),
+            isHistoryVisible = false,
+            isLoading = false,
+            isNoResults = tracks.isEmpty()
+        )
+    }
+
+
+    fun navigateToPlayer(track: Track) {
+        _event.postValue(SearchEvent(navigateToPlayer = track))
     }
 }

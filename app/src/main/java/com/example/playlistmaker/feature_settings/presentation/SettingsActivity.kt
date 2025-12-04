@@ -21,8 +21,9 @@ import kotlinx.coroutines.launch
 class SettingsActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private val viewModel: SettingsViewModel by viewModels { SettingsComponent.viewModelFactory }
-
+    private val viewModel: SettingsViewModel by viewModels {
+        SettingsComponent.createViewModelFactory(this)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -72,7 +73,7 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun updateUI(state: SettingsState) {
-        // Обновляем иконку темы
+
         val iconRes = if (state.isDarkTheme) R.drawable.on else R.drawable.off
         binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
             null,
@@ -81,10 +82,10 @@ class SettingsActivity : BaseActivity() {
             null
         )
 
-        // ✅ ТОЛЬКО применяем тему, БЕЗ recreate()
+
         applyTheme(state.isDarkTheme)
 
-        // Показываем ошибку, если есть
+
         state.error?.let {
             Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         }
@@ -107,7 +108,9 @@ class SettingsActivity : BaseActivity() {
     private fun contactSupport() {
         try {
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:${getString(R.string.support_email)}")
+                data = Uri.parse("mailto:")
+
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))
             }

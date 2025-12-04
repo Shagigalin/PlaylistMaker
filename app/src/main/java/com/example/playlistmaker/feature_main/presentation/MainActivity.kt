@@ -3,7 +3,6 @@ package com.example.playlistmaker.feature_main.presentation
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,7 +14,7 @@ import com.example.playlistmaker.feature_settings.presentation.SettingsActivity
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()  // Используем дефолтную фабрику
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -43,18 +42,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        // Кнопка поиска
+
         binding.buttonSearch.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        // Кнопка медиатеки (пока пусть ведет на поиск или оставьте как есть)
+
         binding.buttonMedia.setOnClickListener {
-            // TODO: Реализовать экран медиатеки
+
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        // Кнопка настроек
+
         binding.buttonSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }

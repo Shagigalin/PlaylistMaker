@@ -137,15 +137,14 @@ class PlayerActivity : AppCompatActivity() {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
         }
 
-        // Активируем/деактивируем кнопки
+
         val isEnabled = state.isPrepared
         binding.btnPlayPause.isEnabled = isEnabled
 
-        // Убедимся что currentTime виден
+
         binding.currentTime.isVisible = true
 
-        // УДАЛИТЕ ЭТУ СТРОКУ - totalTime больше не существует
-        // binding.totalTime.isVisible = false
+
     }
 
     private fun loadTrack() {
@@ -174,6 +173,6 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // ViewModel сам очистит ресурсы в onCleared()
+
     }
 }
