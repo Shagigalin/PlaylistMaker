@@ -14,7 +14,8 @@ object SettingsComponent {
         return object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+                val sharedPreferences = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
                 val repository = SettingsRepositoryImpl(sharedPreferences)
 
                 val getThemeUseCase = GetThemeUseCase(repository)
