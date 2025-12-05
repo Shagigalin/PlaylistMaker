@@ -5,8 +5,14 @@ import androidx.appcompat.app.AppCompatDelegate
 
 class PlaylistMakerApp : Application() {
 
+    companion object {
+        lateinit var instance: PlaylistMakerApp
+            private set
+    }
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
         applyThemeOnStart()
     }
 

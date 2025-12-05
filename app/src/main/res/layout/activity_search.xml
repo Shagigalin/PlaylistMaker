@@ -77,7 +77,8 @@
             android:fontFamily="@font/ys_display_medium"
             android:textColor="?android:attr/textColorPrimary"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"/>
 
         <!-- Список истории -->
         <androidx.recyclerview.widget.RecyclerView
@@ -101,7 +102,8 @@
             android:background="@drawable/button_rounded_bg"
             app:backgroundTint="?attr/colorPrimaryContainer"
             android:textColor="?attr/colorOnPrimaryContainer"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false"
+            android:visibility="visible"/>
 
     </LinearLayout>
 

@@ -21,7 +21,6 @@ class SearchViewModel(
     private val _state = MutableLiveData<SearchState>(SearchState.Initial)
     val state: LiveData<SearchState> = _state
 
-
     private val _event = SingleLiveEvent<SearchEvent>()
     val event: LiveData<SearchEvent> = _event
 
@@ -29,12 +28,10 @@ class SearchViewModel(
     private val SEARCH_DEBOUNCE_DELAY = 1000L
 
     init {
-        println("DEBUG: SearchViewModel created")
         loadSearchHistory()
     }
 
     fun search(query: String) {
-        println("DEBUG: SearchViewModel.search called with: '$query'")
         searchJob?.cancel()
 
         if (query.isEmpty()) {
@@ -43,7 +40,6 @@ class SearchViewModel(
         }
 
         _state.value = SearchState(
-            query = query,
             isLoading = true,
             isSearching = true,
             isHistoryVisible = false,
@@ -58,27 +54,22 @@ class SearchViewModel(
     }
 
     private suspend fun performSearch(query: String) {
-        println("DEBUG: performSearch called with: '$query'")
         try {
             val tracks = searchTracksUseCase.execute(query)
-            println("DEBUG: Received ${tracks.size} tracks")
 
-            _state.postValue(_state.value?.copy(
+            _state.postValue(SearchState(
                 tracks = tracks,
                 isLoading = false,
                 isSearching = tracks.isNotEmpty(),
+                isHistoryVisible = false,
                 isNoResults = tracks.isEmpty()
             ))
         } catch (e: Exception) {
-            println("DEBUG: Search error: ${e.message}")
-            e.printStackTrace()
-
-            _state.postValue(_state.value?.copy(
+            _state.postValue(SearchState(
                 isLoading = false,
                 isError = true,
                 isSearching = false
             ))
-
 
             _event.postValue(SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}"))
         }
@@ -99,35 +90,42 @@ class SearchViewModel(
     }
 
     fun showHistory() {
-        loadSearchHistory()
-        _state.value = SearchState(
-            isHistoryVisible = true,
-            history = _state.value?.history ?: emptyList(),
-            isSearching = false
-        )
+        viewModelScope.launch {
+            val history = getSearchHistoryUseCase.execute()
+            val hasHistory = history.isNotEmpty()
+
+            _state.value = SearchState(
+                history = history,
+                isHistoryVisible = hasHistory,
+                isSearching = false
+            )
+        }
     }
 
-    private fun loadSearchHistory() {
-        val history = getSearchHistoryUseCase.execute()
-        _state.value = _state.value?.copy(
-            history = history,
-            isHistoryVisible = history.isNotEmpty()
-        ) ?: SearchState(history = history, isHistoryVisible = history.isNotEmpty())
-    }
+    fun loadSearchHistory() {
+        viewModelScope.launch {
+            val history = getSearchHistoryUseCase.execute()
+            val hasHistory = history.isNotEmpty()
 
-    fun restoreSearchState(query: String, tracks: List<Track>) {
-        _state.value = SearchState(
-            query = query,
-            tracks = tracks,
-            isSearching = tracks.isNotEmpty(),
-            isHistoryVisible = false,
-            isLoading = false,
-            isNoResults = tracks.isEmpty()
-        )
+            // Обновляем только историю, не меняя другие состояния
+            val currentState = _state.value
+            if (currentState != null) {
+                _state.value = currentState.copy(history = history)
+            } else {
+                _state.value = SearchState(
+                    history = history,
+                    isHistoryVisible = hasHistory
+                )
+            }
+        }
     }
-
 
     fun navigateToPlayer(track: Track) {
-        _event.postValue(SearchEvent(navigateToPlayer = track))
+        viewModelScope.launch {
+            addToSearchHistoryUseCase.execute(track)
+            loadSearchHistory()
+
+            _event.postValue(SearchEvent(navigateToPlayer = track))
+        }
     }
 }
