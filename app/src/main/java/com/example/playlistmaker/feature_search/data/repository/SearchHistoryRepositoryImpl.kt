@@ -8,6 +8,10 @@ class SearchHistoryRepositoryImpl(
     private val sharedPreferencesStorage: SharedPreferencesStorage
 ) : SearchHistoryRepository {
 
+    companion object {
+        private const val SEARCH_HISTORY_KEY = "search_history"
+        private const val MAX_HISTORY_SIZE = 10
+    }
 
     override fun getSearchHistory(): List<Track> {
         return sharedPreferencesStorage.getList(SEARCH_HISTORY_KEY, Track::class.java)
@@ -32,10 +36,5 @@ class SearchHistoryRepositoryImpl(
 
     override fun clearSearchHistory() {
         sharedPreferencesStorage.clear(SEARCH_HISTORY_KEY)
-    }
-
-    companion object {
-        private const val SEARCH_HISTORY_KEY = "search_history"
-        private const val MAX_HISTORY_SIZE = 10
     }
 }

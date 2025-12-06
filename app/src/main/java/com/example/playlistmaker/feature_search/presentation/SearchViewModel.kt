@@ -10,6 +10,10 @@ import com.example.playlistmaker.feature_search.domain.usecase.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.playlistmaker.feature_search.domain.usecase.SearchTracksUseCase
+import com.example.playlistmaker.feature_search.domain.usecase.GetSearchHistoryUseCase
+import com.example.playlistmaker.feature_search.domain.usecase.AddToSearchHistoryUseCase
+import com.example.playlistmaker.feature_search.domain.usecase.ClearSearchHistoryUseCase
 
 class SearchViewModel(
     private val searchTracksUseCase: SearchTracksUseCase,

@@ -80,5 +80,11 @@ dependencies {
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
+    // Koin для Dependency Injection
+    implementation ("io.insert-koin:koin-android:3.5.0")
+    implementation ("io.insert-koin:koin-androidx-compose:3.5.0")
+    implementation ("io.insert-koin:koin-androidx-workmanager:3.5.0")
+    implementation ("io.insert-koin:koin-androidx-navigation:3.5.0")
+
 
 }
