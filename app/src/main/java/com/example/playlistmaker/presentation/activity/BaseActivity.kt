@@ -5,35 +5,24 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 
-open class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
-    protected lateinit var sharedPrefs: SharedPreferences
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        // Инициализация SharedPreferences
-        sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-
-        // Применение темы перед созданием активности
-        applyTheme(sharedPrefs.getBoolean(THEME_KEY, false))
-
-        super.onCreate(savedInstanceState)
+    protected val sharedPrefs: SharedPreferences by lazy {
+        getSharedPreferences("app_prefs", MODE_PRIVATE)
     }
 
-    protected fun applyTheme(isDark: Boolean) {
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
-            else AppCompatDelegate.MODE_NIGHT_NO
-        )
+    protected fun applyTheme(isDarkTheme: Boolean) {
+        println("DEBUG: Applying theme - dark: $isDarkTheme")
+        if (isDarkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
     }
 
-    protected fun isDarkTheme(): Boolean {
-        return sharedPrefs.getBoolean(THEME_KEY, false)
-    }
+
 
     companion object {
-        const val PREFS_NAME = "theme_prefs"
-        const val THEME_KEY = "current_theme"
+        const val THEME_KEY = "dark_theme"
     }
 }
