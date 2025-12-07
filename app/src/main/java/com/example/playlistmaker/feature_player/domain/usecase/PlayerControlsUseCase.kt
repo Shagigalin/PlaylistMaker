@@ -1,13 +1,15 @@
 package com.example.playlistmaker.feature_player.domain.usecase
 
 import android.media.MediaPlayer
+import com.example.playlistmaker.feature_player.data.MediaPlayerProvider
 import com.example.playlistmaker.feature_player.domain.model.PlayerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import java.io.IOException
 
-class PlayerControlsUseCase {
+class PlayerControlsUseCase(
+    private val mediaPlayerProvider: MediaPlayerProvider) {
 
     private var mediaPlayer: MediaPlayer? = null
     private val _playerState = MutableStateFlow(PlayerState(isLoading = false))
@@ -16,7 +18,7 @@ class PlayerControlsUseCase {
     fun prepareMediaPlayer(previewUrl: String) {
         mediaPlayer?.release()
 
-        mediaPlayer = MediaPlayer().apply {
+        mediaPlayer = mediaPlayerProvider.createMediaPlayer().apply {
             setOnPreparedListener {
                 _playerState.update { currentState ->
                     currentState.copy(

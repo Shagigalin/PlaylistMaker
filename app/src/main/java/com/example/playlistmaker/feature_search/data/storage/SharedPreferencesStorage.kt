@@ -4,9 +4,11 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class SharedPreferencesStorage(private val sharedPreferences: SharedPreferences) {
+class SharedPreferencesStorage(
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson) {
 
-    private val gson = Gson()
+
 
     fun <T> getList(key: String, clazz: Class<T>): List<T> {
         val json = sharedPreferences.getString(key, null)
