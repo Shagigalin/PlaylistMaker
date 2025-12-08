@@ -8,7 +8,7 @@ data class PlayerUiState(
     val isPlaying: Boolean = false,
     val isLoading: Boolean = false,
     val currentTime: String = "00:00",
-    val progress: Float = 0f,
+
 
     val error: String? = null,
     val isPrepared: Boolean = false

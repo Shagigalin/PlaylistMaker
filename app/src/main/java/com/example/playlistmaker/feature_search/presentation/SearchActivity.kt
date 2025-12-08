@@ -19,15 +19,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearchBinding
 import com.example.playlistmaker.feature_player.presentation.PlayerActivity
-import com.example.playlistmaker.feature_search.di.SearchComponent
+
 import com.example.playlistmaker.feature_search.domain.model.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModels {
-        SearchComponent.createViewModelFactory(this)
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var historyAdapter: SearchAdapter

@@ -5,9 +5,9 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface iTunesApi {
+interface ITunesApi {
     @GET("search")
-    suspend fun searchTracks(
+    suspend fun search(
         @Query("term") term: String,
         @Query("media") media: String = "music",
         @Query("entity") entity: String = "song",

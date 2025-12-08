@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
 import com.example.playlistmaker.feature_player.domain.usecase.PlayerControlsUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseCase
 import com.example.playlistmaker.feature_search.domain.model.Track
@@ -12,30 +11,32 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
+
 class PlayerViewModel(
+    private val track: Track?,
     private val playerControlsUseCase: PlayerControlsUseCase,
     private val timeFormatterUseCase: TimeFormatterUseCase
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<PlayerUiState>(PlayerUiState())
+    private val _state = MutableLiveData<PlayerUiState>(PlayerUiState(track = track))
     val state: LiveData<PlayerUiState> = _state
 
     private var updateProgressJob: Job? = null
     private val UPDATE_INTERVAL = 100L
 
     init {
-        observePlayerState()
-    }
-
-    fun setTrack(track: Track?) {
+        // Установите загрузку если есть previewUrl
         _state.value = _state.value?.copy(
-            track = track,
-            isLoading = track != null && track.previewUrl != null
+            isLoading = track?.previewUrl != null
         )
 
+        // Подготовьте медиаплеер
         track?.previewUrl?.let { previewUrl ->
             playerControlsUseCase.prepareMediaPlayer(previewUrl)
         }
+
+        observePlayerState()
     }
 
     fun togglePlayback() {
@@ -71,21 +72,19 @@ class PlayerViewModel(
 
     private fun updateUiState(playerState: com.example.playlistmaker.feature_player.domain.model.PlayerState) {
         val currentState = _state.value ?: PlayerUiState()
-        val track = currentState.track
-
+        val currentTrack = currentState.track
 
         val currentTime = timeFormatterUseCase.formatTime(playerState.currentPosition)
         val progress = timeFormatterUseCase.formatProgress(
             playerState.currentPosition,
-            track?.trackTimeMillis?.toInt() ?: 30000
+            currentTrack?.trackTimeMillis?.toInt() ?: 30000
         )
 
         _state.value = currentState.copy(
             isPlaying = playerState.isPlaying,
             currentTime = currentTime,
 
-            progress = progress,
-            isLoading = !playerState.isPrepared && track != null,
+            isLoading = !playerState.isPrepared && currentTrack != null,
             error = playerState.error,
             isPrepared = playerState.isPrepared
         )
@@ -124,7 +123,7 @@ class PlayerViewModel(
 
         _state.value = currentState.copy(
             currentTime = currentTime,
-            progress = progress
+
         )
     }
 

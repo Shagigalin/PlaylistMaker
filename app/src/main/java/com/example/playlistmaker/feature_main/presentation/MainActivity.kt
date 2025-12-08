@@ -8,13 +8,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.example.playlistmaker.feature_player.presentation.PlayerActivity // ДОБАВЬТЕ ЭТОТ ИМПОРТ!
 import com.example.playlistmaker.feature_search.presentation.SearchActivity
 import com.example.playlistmaker.feature_settings.presentation.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -42,17 +42,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-
         binding.buttonSearch.setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-
         binding.buttonMedia.setOnClickListener {
 
-            startActivity(Intent(this, SearchActivity::class.java))
+            startActivity(Intent(this, PlayerActivity::class.java))
         }
-
 
         binding.buttonSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))

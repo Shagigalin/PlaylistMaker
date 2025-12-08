@@ -38,4 +38,5 @@ class SearchHistoryRepositoryImpl(
         private const val SEARCH_HISTORY_KEY = "search_history"
         private const val MAX_HISTORY_SIZE = 10
     }
+
 }

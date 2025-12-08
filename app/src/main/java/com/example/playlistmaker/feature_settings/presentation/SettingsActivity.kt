@@ -14,16 +14,16 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
-import com.example.playlistmaker.feature_settings.di.SettingsComponent
+
 import com.example.playlistmaker.presentation.activity.BaseActivity
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private val viewModel: SettingsViewModel by viewModels {
-        SettingsComponent.createViewModelFactory(this)
-    }
+    private val viewModel: SettingsViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
