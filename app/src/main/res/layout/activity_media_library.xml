@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorOnPrimary">
+
+    <!-- Панель заголовка -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/panel_header"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/colorOnPrimary"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Кнопка назад -->
+        <ImageButton
+            android:id="@+id/button_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/strel"
+            android:contentDescription="@string/back"
+            android:tint="?attr/android:textColorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Заголовок -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/media_library"
+            android:textColor="?attr/android:textColorPrimary"
+            android:textSize="22sp"
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="500"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/button_back"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- TabLayout  -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?attr/colorOnPrimary"
+        app:tabTextAppearance="@style/TabTextStyle"
+        app:tabRippleColor="@android:color/transparent"
+        app:tabTextColor="?attr/android:textColorPrimary"
+        app:tabSelectedTextColor="?attr/android:textColorPrimary"
+        app:tabIndicatorColor="?attr/android:textColorPrimary">
+
+    <!-- Вкладка Плейлисты -->
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlists" />
+
+    <!-- Вкладка Избранные треки -->
+    <com.google.android.material.tabs.TabItem
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/favorite_tracks" />
+
+</com.google.android.material.tabs.TabLayout>
+
+    <!-- ViewPager2 для фрагментов -->
+<androidx.viewpager2.widget.ViewPager2
+android:id="@+id/view_pager"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_weight="1"
+android:background="?attr/colorOnPrimary"/>
+
+    </LinearLayout>

@@ -45,6 +45,11 @@
             android:name=".feature_settings.presentation.SettingsActivity"
             android:theme="@style/Theme.PlaylistMaker" />
 
+        <activity
+            android:name=".feature_medialibrary.presentation.MediaLibraryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PlaylistMaker" />
+
     </application>
 
 </manifest>

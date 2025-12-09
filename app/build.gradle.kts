@@ -86,5 +86,8 @@ dependencies {
     implementation ("io.insert-koin:koin-androidx-workmanager:3.5.0")
     implementation ("io.insert-koin:koin-androidx-navigation:3.5.0")
 
+    // Material Components
+    implementation("com.google.android.material:material:1.11.0")
+
 
 }
