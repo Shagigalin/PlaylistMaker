@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.example.playlistmaker.feature_medialibrary.presentation.MediaLibraryActivity
 import com.example.playlistmaker.feature_player.presentation.PlayerActivity // ДОБАВЬТЕ ЭТОТ ИМПОРТ!
 import com.example.playlistmaker.feature_search.presentation.SearchActivity
 import com.example.playlistmaker.feature_settings.presentation.SettingsActivity
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonMedia.setOnClickListener {
 
-            startActivity(Intent(this, PlayerActivity::class.java))
+            startActivity(Intent(this, MediaLibraryActivity::class.java))
         }
 
         binding.buttonSettings.setOnClickListener {
