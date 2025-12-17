@@ -13,38 +13,30 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="?attr/colorOnPrimary"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
 
-        <!-- Кнопка назад -->
-        <ImageButton
-            android:id="@+id/button_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/strel"
-            android:contentDescription="@string/back"
-            android:tint="?attr/android:textColorPrimary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        >
 
-        <!-- Заголовок -->
         <TextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:fontFamily="@font/ys_display_medium"
+            android:gravity="center_vertical"
             android:text="@string/media_library"
             android:textColor="?attr/android:textColorPrimary"
-            android:textSize="22sp"
-            android:fontFamily="@font/ys_display_medium"
             android:textFontWeight="500"
-            android:gravity="center_vertical"
+            android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/button_back"
+
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

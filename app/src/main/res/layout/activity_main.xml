@@ -1,49 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?attr/colorPrimaryVariant">
+    android:background="?attr/colorSurface"
+    tools:context=".feature_main.presentation.MainActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimaryVariant"
-        app:title="@string/app_name"
-        app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
-        app:titleTextColor="@color/white"/>
+    <!-- Навигационный хост -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/main_nav_graph" />
 
-    <!-- Кнопка поиска -->
-    <Button
-        android:id="@+id/button_search"
-        style="@style/MyButtonStyle"
-        android:layout_width="match_parent"
+    <!-- Bottom Navigation View -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/search"
-        app:icon="@drawable/poisk"/>
+        android:background="?attr/colorOnPrimaryContainer"
+        app:itemIconTint="@drawable/bottom_nav_item_selector"
+        app:itemTextColor="@drawable/bottom_nav_item_selector"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
 
-    <!-- Кнопка media -->
-    <Button
-        android:id="@+id/button_media"
-        style="@style/MyButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/media"
-        app:icon="@drawable/media"/>
-
-    <!-- Кнопка настроек -->
-    <Button
-        android:id="@+id/button_settings"
-        style="@style/MyButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/nastr"
-        app:icon="@drawable/nastr"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
