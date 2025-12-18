@@ -46,8 +46,6 @@ class SearchFragment : Fragment() {
         setupViews()
         setupObservers()
 
-        // Убираем кнопку назад
-        // binding.toolbar.setNavigationOnClickListener { ... } - удаляем
     }
 
     override fun onResume() {

@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.feature_settings.domain.model.Settings
 import com.example.playlistmaker.feature_settings.domain.usecase.GetThemeUseCaseInterface
 import com.example.playlistmaker.feature_settings.domain.usecase.SetThemeUseCaseInterface
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 
 class SettingsViewModel(
     private val getThemeUseCase: GetThemeUseCaseInterface,
@@ -30,6 +32,7 @@ class SettingsViewModel(
         try {
             _state.value = SettingsState(isDarkTheme = getThemeUseCase.execute().isDarkTheme)
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             _state.value = SettingsState(error = e.message)
         }
     }
@@ -37,7 +40,10 @@ class SettingsViewModel(
     private fun applySavedTheme() = viewModelScope.launch {
         try {
             applyTheme(getThemeUseCase.execute().isDarkTheme)
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+
+        }
     }
 
     fun toggleTheme() = viewModelScope.launch {
@@ -50,6 +56,7 @@ class SettingsViewModel(
             _state.value = currentState.copy(isDarkTheme = newDarkTheme)
             _shouldRecreate.value = true
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             _state.value = currentState.copy(error = e.message)
         }
     }
