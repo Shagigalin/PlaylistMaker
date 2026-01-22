@@ -9,14 +9,17 @@
 
     <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginStart="16dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
         app:title="@string/search_hint"
-        app:navigationIcon="@drawable/strel"
         app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
         app:titleTextColor="?attr/android:textColorPrimary"
-        app:navigationIconTint="?attr/android:textColorPrimary"/>
+        app:navigationIconTint="?attr/android:textColorPrimary"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"/>
 
     <!-- Поисковая строка -->
     <FrameLayout

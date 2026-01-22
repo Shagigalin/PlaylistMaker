@@ -4,56 +4,42 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
-
-import com.example.playlistmaker.presentation.activity.BaseActivity
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : BaseActivity() {
+class SettingsFragment : Fragment() {
 
-    private lateinit var binding: ActivitySettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setupEdgeToEdge()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
     }
 
-    private fun setupEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-
-            view.updatePadding(
-                top = statusBarInsets.top,
-                bottom = navigationBarInsets.bottom
-            )
-
-            insets
-        }
-    }
-
     private fun setupViews() {
-        binding.buttonBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
+        // Убираем кнопку назад
+        // binding.buttonBack.setOnClickListener { ... } - удаляем
 
         binding.temaButton.setOnClickListener {
             viewModel.toggleTheme()
@@ -65,30 +51,21 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.state.observe(this@SettingsActivity) { state ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.observe(viewLifecycleOwner) { state ->
                 updateUI(state)
             }
         }
     }
 
     private fun updateUI(state: SettingsState) {
-
         val iconRes = if (state.isDarkTheme) R.drawable.on else R.drawable.off
         binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
             null,
             null,
-            getDrawable(iconRes),
+            context?.getDrawable(iconRes),
             null
         )
-
-
-        applyTheme(state.isDarkTheme)
-
-
-        state.error?.let {
-            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun shareApp() {
@@ -130,6 +107,11 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun showToast(messageRes: Int) {
-        Toast.makeText(this, getString(messageRes), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(messageRes), Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

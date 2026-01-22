@@ -126,10 +126,11 @@ class SearchViewModel(
 
     fun navigateToPlayer(track: Track) {
         viewModelScope.launch {
-            addToSearchHistoryUseCase.execute(track)
-            loadSearchHistory()
+            // Добавляем в историю
+            addToHistory(track)
 
-            _event.postValue(SearchEvent(navigateToPlayer = track))
+            // Создаем событие навигации
+            _event.value = SearchEvent(navigateToPlayer = track)
         }
     }
 }

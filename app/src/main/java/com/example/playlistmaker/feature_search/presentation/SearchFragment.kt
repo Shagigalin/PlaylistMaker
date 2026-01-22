@@ -1,31 +1,27 @@
 package com.example.playlistmaker.feature_search.presentation
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.feature_player.presentation.PlayerActivity
-
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.feature_search.domain.model.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
-    private lateinit var binding: ActivitySearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var searchAdapter: SearchAdapter
@@ -33,52 +29,28 @@ class SearchActivity : AppCompatActivity() {
 
     private var lastClickTime = 0L
     private val CLICK_DEBOUNCE_DELAY = 1000L
-
-    // ActivityResultLauncher для отслеживания возврата из плеера
-    private lateinit var playerLauncher: ActivityResultLauncher<Intent>
-
-    // Флаг для предотвращения бесконечного цикла
     private var isTextChangeFromUser = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        enableEdgeToEdge()
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Регистрируем ActivityResultLauncher
-        playerLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            // При возврате из плеера просто обновляем историю
-            viewModel.loadSearchHistory()
-        }
-
-        setupEdgeToEdge()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupAdapters()
         setupViews()
         setupObservers()
+
     }
 
     override fun onResume() {
         super.onResume()
-        // При возвращении на экран просто обновляем историю
         viewModel.loadSearchHistory()
-    }
-
-    private fun setupEdgeToEdge() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val statusBarInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
-            val navigationBarInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-
-            view.updatePadding(
-                top = statusBarInsets.top,
-                bottom = navigationBarInsets.bottom
-            )
-
-            insets
-        }
     }
 
     private fun setupAdapters() {
@@ -90,18 +62,14 @@ class SearchActivity : AppCompatActivity() {
             onHistoryTrackClick(track)
         }
 
-        binding.searchResultsRecycler.layoutManager = LinearLayoutManager(this)
+        binding.searchResultsRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.searchResultsRecycler.adapter = searchAdapter
 
-        binding.historyRecycler.layoutManager = LinearLayoutManager(this)
+        binding.historyRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.historyRecycler.adapter = historyAdapter
     }
 
     private fun setupViews() {
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
-
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -138,20 +106,20 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.state.observe(this) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
 
-        viewModel.event.observe(this) { event ->
+        viewModel.event.observe(viewLifecycleOwner) { event ->
             event?.let {
                 it.errorMessage?.let { message ->
-                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
 
                 it.navigateToPlayer?.let { track ->
-                    val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
-                    intent.putExtra("track", track)
-                    playerLauncher.launch(intent)
+                    // Навигация к PlayerFragment через Navigation Component
+                    val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
+                    findNavController().navigate(action)
                 }
             }
         }
@@ -160,11 +128,9 @@ class SearchActivity : AppCompatActivity() {
     private fun updateUI(state: SearchState) {
         binding.progressBar.isVisible = state.isLoading
 
-        // История показывается только если есть элементы И мы не в процессе поиска
         val hasHistory = state.history.isNotEmpty()
         val showHistory = state.isHistoryVisible && hasHistory && !state.isSearching
 
-        // Показываем историю
         if (showHistory) {
             binding.historyLayout.isVisible = true
             binding.historyTitle.isVisible = true
@@ -176,7 +142,6 @@ class SearchActivity : AppCompatActivity() {
             binding.clearHistoryButton.isVisible = false
         }
 
-        // Показываем результаты поиска
         val showSearchResults = state.isSearching && !state.isLoading && !state.isNoResults
         binding.searchResultsRecycler.isVisible = showSearchResults
 
@@ -184,13 +149,8 @@ class SearchActivity : AppCompatActivity() {
             searchAdapter.updateTracks(state.tracks)
         }
 
-        // Ошибка
         binding.errorLayout.isVisible = state.isError
-
-        // Нет результатов
         binding.noResultsLayout.isVisible = state.isNoResults
-
-        // Прогресс
         binding.progressBar.isVisible = state.isLoading
     }
 
@@ -198,8 +158,6 @@ class SearchActivity : AppCompatActivity() {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
             lastClickTime = currentTime
-
-            // Добавляем в историю и открываем плеер через ViewModel
             viewModel.navigateToPlayer(track)
         }
     }
@@ -208,14 +166,17 @@ class SearchActivity : AppCompatActivity() {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
             lastClickTime = currentTime
-
-            // Добавляем в историю и открываем плеер через ViewModel
             viewModel.navigateToPlayer(track)
         }
     }
 
     private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireContext().getSystemService(InputMethodManager::class.java)
         imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

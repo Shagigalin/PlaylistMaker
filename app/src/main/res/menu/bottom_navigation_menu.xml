@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Поиск  -->
+    <item
+        android:id="@+id/searchFragment"
+        android:icon="@drawable/poisk"
+        android:title="@string/search"
+        android:orderInCategory="1" />
+
+    <!-- Медиатека -->
+    <item
+        android:id="@+id/mediaLibraryFragment"
+        android:icon="@drawable/media"
+        android:title="@string/media"
+        android:orderInCategory="2" />
+
+    <!-- Настройки  -->
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/nastr"
+        android:title="@string/nastr"
+        android:orderInCategory="3" />
+
+</menu>

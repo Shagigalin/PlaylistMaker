@@ -11,55 +11,33 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
-
 class PlayerViewModel(
     private val track: Track?,
     private val playerControlsUseCase: PlayerControlsUseCase,
     private val timeFormatterUseCase: TimeFormatterUseCase
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<PlayerUiState>(PlayerUiState(track = track))
+    // Инициализация состояния с переданным треком
+    private val _state = MutableLiveData<PlayerUiState>(
+        PlayerUiState(
+            track = track,
+            isPrepared = track?.previewUrl == null // Если нет previewUrl - плеер сразу готов
+        )
+    )
+
     val state: LiveData<PlayerUiState> = _state
 
     private var updateProgressJob: Job? = null
-    private val UPDATE_INTERVAL = 100L
+    private val UPDATE_INTERVAL = 100L // Обновление каждые 100мс
 
     init {
-        // Установите загрузку если есть previewUrl
-        _state.value = _state.value?.copy(
-            isLoading = track?.previewUrl != null
-        )
-
-        // Подготовьте медиаплеер
+        // Инициализируем только если есть трек с previewUrl
         track?.previewUrl?.let { previewUrl ->
+            _state.value = _state.value?.copy(isLoading = true)
             playerControlsUseCase.prepareMediaPlayer(previewUrl)
         }
 
         observePlayerState()
-    }
-
-    fun togglePlayback() {
-        if (_state.value?.isPlaying == true) {
-            pause()
-        } else {
-            play()
-        }
-    }
-
-    fun play() {
-        playerControlsUseCase.play()
-    }
-
-    fun pause() {
-        playerControlsUseCase.pause()
-        stopProgressUpdates()
-    }
-
-    fun seekTo(progress: Float) {
-        val duration = _state.value?.track?.trackTimeMillis?.toInt() ?: 30000
-        val position = (progress * duration).toInt()
-        playerControlsUseCase.seekTo(position)
     }
 
     private fun observePlayerState() {
@@ -71,19 +49,14 @@ class PlayerViewModel(
     }
 
     private fun updateUiState(playerState: com.example.playlistmaker.feature_player.domain.model.PlayerState) {
-        val currentState = _state.value ?: PlayerUiState()
+        val currentState = _state.value ?: return
         val currentTrack = currentState.track
 
         val currentTime = timeFormatterUseCase.formatTime(playerState.currentPosition)
-        val progress = timeFormatterUseCase.formatProgress(
-            playerState.currentPosition,
-            currentTrack?.trackTimeMillis?.toInt() ?: 30000
-        )
 
         _state.value = currentState.copy(
             isPlaying = playerState.isPlaying,
             currentTime = currentTime,
-
             isLoading = !playerState.isPrepared && currentTrack != null,
             error = playerState.error,
             isPrepared = playerState.isPrepared
@@ -94,6 +67,41 @@ class PlayerViewModel(
         } else {
             stopProgressUpdates()
         }
+    }
+
+    // Управление воспроизведением
+    fun togglePlayback() {
+        val currentState = _state.value ?: return
+
+        // Если нет трека - ничего не делаем
+        if (currentState.track == null) return
+
+        if (currentState.isPlaying) {
+            pause()
+        } else {
+            play()
+        }
+    }
+
+    fun play() {
+        val currentState = _state.value ?: return
+
+        // Проверяем, готов ли плеер и есть ли трек
+        if (currentState.track == null || !currentState.isPrepared) return
+
+        playerControlsUseCase.play()
+    }
+
+    fun pause() {
+        playerControlsUseCase.pause()
+        stopProgressUpdates()
+    }
+
+    // Управление прогрессом
+    fun seekTo(progress: Float) {
+        val duration = _state.value?.track?.trackTimeMillis?.toInt() ?: return
+        val position = (progress * duration).toInt()
+        playerControlsUseCase.seekTo(position)
     }
 
     private fun startProgressUpdates() {
@@ -112,24 +120,20 @@ class PlayerViewModel(
     }
 
     private fun updateCurrentPosition() {
-        val currentPosition = playerControlsUseCase.getCurrentPosition()
         val currentState = _state.value ?: return
+        val currentTrack = currentState.track ?: return
 
+        val currentPosition = playerControlsUseCase.getCurrentPosition()
         val currentTime = timeFormatterUseCase.formatTime(currentPosition)
-        val progress = timeFormatterUseCase.formatProgress(
-            currentPosition,
-            currentState.track?.trackTimeMillis?.toInt() ?: 30000
-        )
 
-        _state.value = currentState.copy(
-            currentTime = currentTime,
-
-        )
+        _state.value = currentState.copy(currentTime = currentTime)
     }
 
+    // Очистка ресурсов
     override fun onCleared() {
         super.onCleared()
         playerControlsUseCase.release()
         stopProgressUpdates()
     }
 }
+

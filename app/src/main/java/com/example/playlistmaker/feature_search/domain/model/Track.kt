@@ -1,7 +1,9 @@
 package com.example.playlistmaker.feature_search.domain.model
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Track(
     val trackId: Long,
     val trackName: String,
@@ -13,7 +15,7 @@ data class Track(
     val primaryGenreName: String?,
     val country: String?,
     val previewUrl: String?
-) : Serializable {
+) : Parcelable {
 
     fun getFormattedTime(): String {
         return if (trackTimeMillis > 0) {

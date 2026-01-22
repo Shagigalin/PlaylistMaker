@@ -94,4 +94,13 @@
     <string name="no_favorite_tracks_message">Ваша медиатека пуста</string>
 
 
+    <string name="add_to_playlist_message">Добавить в плейлист</string>
+    <string name="add_to_favorites_message">Добавить в избранное</string>
+
+
+    <string name="player_no_track_title">Нет трека</string>
+    <string name="player_no_track_subtitle">Выберите трек в поиске</string>
+    <string name="player_select_track_message">Выберите трек в поиске</string>
+
+
 </resources>
