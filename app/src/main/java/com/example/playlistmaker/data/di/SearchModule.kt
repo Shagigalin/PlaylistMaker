@@ -45,8 +45,10 @@ val searchModule = module {
     }
 
     // 2. Repositories
-    single<TrackRepository> {
-        TrackRepositorySimple(get()) // зависит от ITunesApi
+    factory<TrackRepository> {
+        TrackRepositorySimple(
+            iTunesApi = get<ITunesApi>()
+        )
     }
 
     single<SearchHistoryRepository> {
@@ -55,7 +57,9 @@ val searchModule = module {
 
     // 3. Use Cases - factory (создаются каждый раз новые)
     factory<SearchTracksUseCase> {
-        SearchTracksUseCaseImpl(get()) // зависит от TrackRepository
+        SearchTracksUseCaseImpl(
+            trackRepository = get()
+        )
     }
 
     factory<GetSearchHistoryUseCase> {

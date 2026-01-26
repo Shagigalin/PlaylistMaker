@@ -9,6 +9,8 @@ import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseC
 import com.example.playlistmaker.feature_search.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
@@ -17,21 +19,21 @@ class PlayerViewModel(
     private val timeFormatterUseCase: TimeFormatterUseCase
 ) : ViewModel() {
 
-    // Инициализация состояния с переданным треком
+    companion object {
+        private const val UPDATE_INTERVAL_MS = 300L
+    }
+
     private val _state = MutableLiveData<PlayerUiState>(
         PlayerUiState(
             track = track,
-            isPrepared = track?.previewUrl == null // Если нет previewUrl - плеер сразу готов
+            isPrepared = track?.previewUrl == null
         )
     )
-
     val state: LiveData<PlayerUiState> = _state
 
-    private var updateProgressJob: Job? = null
-    private val UPDATE_INTERVAL = 100L // Обновление каждые 100мс
+    private var progressUpdateJob: Job? = null
 
     init {
-        // Инициализируем только если есть трек с previewUrl
         track?.previewUrl?.let { previewUrl ->
             _state.value = _state.value?.copy(isLoading = true)
             playerControlsUseCase.prepareMediaPlayer(previewUrl)
@@ -50,73 +52,45 @@ class PlayerViewModel(
 
     private fun updateUiState(playerState: com.example.playlistmaker.feature_player.domain.model.PlayerState) {
         val currentState = _state.value ?: return
-        val currentTrack = currentState.track
 
         val currentTime = timeFormatterUseCase.formatTime(playerState.currentPosition)
 
         _state.value = currentState.copy(
             isPlaying = playerState.isPlaying,
             currentTime = currentTime,
-            isLoading = !playerState.isPrepared && currentTrack != null,
+            isLoading = !playerState.isPrepared && currentState.track != null,
             error = playerState.error,
             isPrepared = playerState.isPrepared
         )
 
-        if (playerState.isPlaying) {
-            startProgressUpdates()
-        } else {
-            stopProgressUpdates()
+        // Управляем обновлением прогресса
+        when {
+            playerState.isPlaying -> startProgressUpdates()
+            !playerState.isPlaying -> stopProgressUpdates()
+            playerState.currentPosition == 0 && !playerState.isPlaying -> {
+                // Воспроизведение завершено, сбрасываем прогресс
+                stopProgressUpdates()
+                _state.value = currentState.copy(
+                    currentTime = "00:00",
+                    isPlaying = false
+                )
+            }
         }
-    }
-
-    // Управление воспроизведением
-    fun togglePlayback() {
-        val currentState = _state.value ?: return
-
-        // Если нет трека - ничего не делаем
-        if (currentState.track == null) return
-
-        if (currentState.isPlaying) {
-            pause()
-        } else {
-            play()
-        }
-    }
-
-    fun play() {
-        val currentState = _state.value ?: return
-
-        // Проверяем, готов ли плеер и есть ли трек
-        if (currentState.track == null || !currentState.isPrepared) return
-
-        playerControlsUseCase.play()
-    }
-
-    fun pause() {
-        playerControlsUseCase.pause()
-        stopProgressUpdates()
-    }
-
-    // Управление прогрессом
-    fun seekTo(progress: Float) {
-        val duration = _state.value?.track?.trackTimeMillis?.toInt() ?: return
-        val position = (progress * duration).toInt()
-        playerControlsUseCase.seekTo(position)
     }
 
     private fun startProgressUpdates() {
-        updateProgressJob?.cancel()
-        updateProgressJob = viewModelScope.launch {
+        progressUpdateJob?.cancel()
+        progressUpdateJob = viewModelScope.launch {
             while (true) {
-                delay(UPDATE_INTERVAL)
+                delay(UPDATE_INTERVAL_MS)
                 updateCurrentPosition()
             }
         }
     }
 
     private fun stopProgressUpdates() {
-        updateProgressJob?.cancel()
-        updateProgressJob = null
+        progressUpdateJob?.cancel()
+        progressUpdateJob = null
     }
 
     private fun updateCurrentPosition() {
@@ -129,11 +103,36 @@ class PlayerViewModel(
         _state.value = currentState.copy(currentTime = currentTime)
     }
 
-    // Очистка ресурсов
+    fun togglePlayback() {
+        val currentState = _state.value ?: return
+        if (currentState.track == null) return
+
+        if (currentState.isPlaying) {
+            pause()
+        } else {
+            play()
+        }
+    }
+
+    fun play() {
+        val currentState = _state.value ?: return
+        if (currentState.track == null || !currentState.isPrepared) return
+        playerControlsUseCase.play()
+    }
+
+    fun pause() {
+        playerControlsUseCase.pause()
+    }
+
+    fun seekTo(progress: Float) {
+        val duration = _state.value?.track?.trackTimeMillis?.toInt() ?: return
+        val position = (progress * duration).toInt()
+        playerControlsUseCase.seekTo(position)
+    }
+
     override fun onCleared() {
         super.onCleared()
         playerControlsUseCase.release()
         stopProgressUpdates()
     }
 }
-

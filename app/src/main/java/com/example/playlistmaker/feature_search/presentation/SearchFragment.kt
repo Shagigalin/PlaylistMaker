@@ -27,10 +27,6 @@ class SearchFragment : Fragment() {
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var historyAdapter: SearchAdapter
 
-    private var lastClickTime = 0L
-    private val CLICK_DEBOUNCE_DELAY = 1000L
-    private var isTextChangeFromUser = true
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,7 +41,6 @@ class SearchFragment : Fragment() {
         setupAdapters()
         setupViews()
         setupObservers()
-
     }
 
     override fun onResume() {
@@ -55,11 +50,13 @@ class SearchFragment : Fragment() {
 
     private fun setupAdapters() {
         searchAdapter = SearchAdapter(emptyList()) { track: Track ->
-            onTrackClick(track)
+
+            viewModel.onTrackClick(track)
         }
 
         historyAdapter = SearchAdapter(emptyList()) { track: Track ->
-            onHistoryTrackClick(track)
+
+            viewModel.onTrackClick(track)
         }
 
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -78,17 +75,13 @@ class SearchFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                if (isTextChangeFromUser) {
-                    val query = s?.toString()?.trim() ?: ""
-                    viewModel.search(query)
-                }
+                val query = s?.toString()?.trim() ?: ""
+                viewModel.search(query)
             }
         })
 
         binding.clearButton.setOnClickListener {
-            isTextChangeFromUser = false
             binding.searchEditText.setText("")
-            isTextChangeFromUser = true
             hideKeyboard()
             viewModel.showHistory()
         }
@@ -117,7 +110,6 @@ class SearchFragment : Fragment() {
                 }
 
                 it.navigateToPlayer?.let { track ->
-                    // Навигация к PlayerFragment через Navigation Component
                     val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
                     findNavController().navigate(action)
                 }
@@ -152,22 +144,6 @@ class SearchFragment : Fragment() {
         binding.errorLayout.isVisible = state.isError
         binding.noResultsLayout.isVisible = state.isNoResults
         binding.progressBar.isVisible = state.isLoading
-    }
-
-    private fun onTrackClick(track: Track) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
-            lastClickTime = currentTime
-            viewModel.navigateToPlayer(track)
-        }
-    }
-
-    private fun onHistoryTrackClick(track: Track) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
-            lastClickTime = currentTime
-            viewModel.navigateToPlayer(track)
-        }
     }
 
     private fun hideKeyboard() {
