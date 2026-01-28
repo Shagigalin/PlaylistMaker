@@ -34,6 +34,8 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private var clickDebounceJob: Job? = null
 
+    private var lastSearchQuery: String? = null
+    private var lastSearchResults: List<Track> = emptyList()
 
     private val searchQuery = MutableStateFlow("")
 
@@ -72,22 +74,39 @@ class SearchViewModel(
         )
     }
 
+    fun performSearchDirectly(query: String) {
+        lastSearchQuery = query
+        performSearch(query)
+    }
+
     private fun performSearch(query: String) {
-        viewModelScope.launch {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             searchTracksUseCase.execute(query)
                 .onStart {
-                    _state.value = _state.value?.copy(isLoading = true) ?:
-                            SearchState(isLoading = true, isSearching = true)
+                    _state.value = SearchState(
+                        isLoading = true,
+                        isSearching = true,
+                        isHistoryVisible = false,
+                        isError = false,
+                        isNoResults = false
+                    )
                 }
                 .catch { e ->
+                    lastSearchResults = emptyList()
                     _state.value = SearchState(
                         isLoading = false,
                         isError = true,
-                        isSearching = false
+                        isSearching = false,
+                        isHistoryVisible = false,
+                        tracks = emptyList()
                     )
                     _event.value = SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}")
                 }
                 .collect { tracks ->
+                    lastSearchQuery = query
+                    lastSearchResults = tracks
+
                     _state.value = SearchState(
                         tracks = tracks,
                         isLoading = false,
@@ -99,6 +118,19 @@ class SearchViewModel(
         }
     }
 
+    fun restorePreviousSearch() {
+        lastSearchQuery?.let { query ->
+            if (query.isNotEmpty()) {
+                _state.value = SearchState(
+                    tracks = lastSearchResults,
+                    isLoading = false,
+                    isSearching = lastSearchResults.isNotEmpty(),
+                    isHistoryVisible = false,
+                    isNoResults = lastSearchResults.isEmpty()
+                )
+            }
+        }
+    }
 
     fun onTrackClick(track: Track) {
 
@@ -113,9 +145,7 @@ class SearchViewModel(
     }
 
 
-    fun navigateToPlayer(track: Track) {
-        onTrackClick(track)
-    }
+
 
     fun addToHistory(track: Track) {
         viewModelScope.launch {

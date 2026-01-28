@@ -43,8 +43,14 @@ class SearchFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onPause() {
+        super.onPause()
+        hideKeyboard()
+    }
+
     override fun onResume() {
         super.onResume()
+        viewModel.restorePreviousSearch()
         viewModel.loadSearchHistory()
     }
 
@@ -93,7 +99,11 @@ class SearchFragment : Fragment() {
         binding.retryButton.setOnClickListener {
             val query = binding.searchEditText.text.toString().trim()
             if (query.isNotEmpty()) {
-                viewModel.search(query)
+
+                viewModel.performSearchDirectly(query)
+            } else {
+
+                viewModel.showHistory()
             }
         }
     }
@@ -142,8 +152,33 @@ class SearchFragment : Fragment() {
         }
 
         binding.errorLayout.isVisible = state.isError
+        if (state.isError) {
+
+            val errorImage = when (isDarkTheme()) {
+                true -> R.drawable.nointernetdark
+                false -> R.drawable.nointernetlight
+            }
+            binding.errorImage.setImageResource(errorImage)
+            binding.errorText.text = getString(R.string.connection_error)
+        }
         binding.noResultsLayout.isVisible = state.isNoResults
+
+        if (state.isNoResults) {
+            val noResultsImage = when (isDarkTheme()) {
+                true -> R.drawable.noinfdark
+                false -> R.drawable.noinflight
+            }
+            binding.noResultsImage.setImageResource(noResultsImage)
+            binding.noResultsText.text = getString(R.string.no_results_found)
+        }
+
         binding.progressBar.isVisible = state.isLoading
+    }
+
+    private fun isDarkTheme(): Boolean {
+        val configuration = resources.configuration
+        val nightModeFlags = configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun hideKeyboard() {
