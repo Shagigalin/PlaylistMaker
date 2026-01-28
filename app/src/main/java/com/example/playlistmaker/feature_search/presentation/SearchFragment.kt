@@ -27,10 +27,6 @@ class SearchFragment : Fragment() {
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var historyAdapter: SearchAdapter
 
-    private var lastClickTime = 0L
-    private val CLICK_DEBOUNCE_DELAY = 1000L
-    private var isTextChangeFromUser = true
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,21 +41,28 @@ class SearchFragment : Fragment() {
         setupAdapters()
         setupViews()
         setupObservers()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        hideKeyboard()
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.restorePreviousSearch()
         viewModel.loadSearchHistory()
     }
 
     private fun setupAdapters() {
         searchAdapter = SearchAdapter(emptyList()) { track: Track ->
-            onTrackClick(track)
+
+            viewModel.onTrackClick(track)
         }
 
         historyAdapter = SearchAdapter(emptyList()) { track: Track ->
-            onHistoryTrackClick(track)
+
+            viewModel.onTrackClick(track)
         }
 
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -78,17 +81,13 @@ class SearchFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                if (isTextChangeFromUser) {
-                    val query = s?.toString()?.trim() ?: ""
-                    viewModel.search(query)
-                }
+                val query = s?.toString()?.trim() ?: ""
+                viewModel.search(query)
             }
         })
 
         binding.clearButton.setOnClickListener {
-            isTextChangeFromUser = false
             binding.searchEditText.setText("")
-            isTextChangeFromUser = true
             hideKeyboard()
             viewModel.showHistory()
         }
@@ -100,7 +99,11 @@ class SearchFragment : Fragment() {
         binding.retryButton.setOnClickListener {
             val query = binding.searchEditText.text.toString().trim()
             if (query.isNotEmpty()) {
-                viewModel.search(query)
+
+                viewModel.performSearchDirectly(query)
+            } else {
+
+                viewModel.showHistory()
             }
         }
     }
@@ -117,7 +120,6 @@ class SearchFragment : Fragment() {
                 }
 
                 it.navigateToPlayer?.let { track ->
-                    // Навигация к PlayerFragment через Navigation Component
                     val action = SearchFragmentDirections.actionSearchFragmentToPlayerFragment(track)
                     findNavController().navigate(action)
                 }
@@ -150,24 +152,33 @@ class SearchFragment : Fragment() {
         }
 
         binding.errorLayout.isVisible = state.isError
+        if (state.isError) {
+
+            val errorImage = when (isDarkTheme()) {
+                true -> R.drawable.nointernetdark
+                false -> R.drawable.nointernetlight
+            }
+            binding.errorImage.setImageResource(errorImage)
+            binding.errorText.text = getString(R.string.connection_error)
+        }
         binding.noResultsLayout.isVisible = state.isNoResults
+
+        if (state.isNoResults) {
+            val noResultsImage = when (isDarkTheme()) {
+                true -> R.drawable.noinfdark
+                false -> R.drawable.noinflight
+            }
+            binding.noResultsImage.setImageResource(noResultsImage)
+            binding.noResultsText.text = getString(R.string.no_results_found)
+        }
+
         binding.progressBar.isVisible = state.isLoading
     }
 
-    private fun onTrackClick(track: Track) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
-            lastClickTime = currentTime
-            viewModel.navigateToPlayer(track)
-        }
-    }
-
-    private fun onHistoryTrackClick(track: Track) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastClickTime > CLICK_DEBOUNCE_DELAY) {
-            lastClickTime = currentTime
-            viewModel.navigateToPlayer(track)
-        }
+    private fun isDarkTheme(): Boolean {
+        val configuration = resources.configuration
+        val nightModeFlags = configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
     }
 
     private fun hideKeyboard() {

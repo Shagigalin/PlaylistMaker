@@ -3,7 +3,8 @@ package com.example.playlistmaker.feature_search.data.repository
 import com.example.playlistmaker.feature_search.data.network.ITunesApi
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.repository.TrackRepository
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.net.UnknownHostException
 
@@ -11,28 +12,27 @@ class TrackRepositorySimple(
     private val iTunesApi: ITunesApi
 ) : TrackRepository {
 
-    override suspend fun searchTracks(query: String): List<Track> {
-        return try {
-            if (query.isNotEmpty()) {
-                val response = iTunesApi.search(query)
+    override fun searchTracks(query: String): Flow<List<Track>> = flow {
+        try {
+            if (query.isEmpty()) {
+                emit(emptyList())
+                return@flow
+            }
 
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
+            val response = iTunesApi.search(query)
 
-                    if (responseBody != null && responseBody.results.isNotEmpty()) {
-                        responseBody.results.map { it.toTrack() }
-                    } else {
-                        emptyList()
-                    }
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+
+                if (responseBody != null && responseBody.results.isNotEmpty()) {
+                    val tracks = responseBody.results.map { it.toTrack() }
+                    emit(tracks)
                 } else {
-                    throw Exception("Ошибка сервера: ${response.code()}")
+                    emit(emptyList())
                 }
             } else {
-                emptyList()
+                throw HttpException(response)
             }
-        } catch (e: CancellationException) {
-
-            throw e
         } catch (e: HttpException) {
             throw Exception("Ошибка сервера: ${e.code()}")
         } catch (e: UnknownHostException) {

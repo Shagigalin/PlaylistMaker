@@ -1,7 +1,7 @@
 package com.example.playlistmaker.feature_settings.domain.usecase
 
-import com.example.playlistmaker.feature_settings.domain.model.Settings
+import com.example.playlistmaker.feature_settings.domain.model.ThemeSettings
 
 interface SetThemeUseCaseInterface {
-    fun execute(settings: Settings)
+    fun execute(theme: ThemeSettings)
 }

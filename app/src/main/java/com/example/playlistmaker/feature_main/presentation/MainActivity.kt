@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -25,8 +26,6 @@ class MainActivity : AppCompatActivity() {
         setupStatusBarInsets()
         setupNavigation()
 
-
-        binding.bottomNavigationView.selectedItemId = R.id.mediaLibraryFragment
     }
 
     private fun setupStatusBarInsets() {
@@ -50,15 +49,12 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNavigationView.setupWithNavController(navController)
 
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.playerFragment -> {
-
                     binding.bottomNavigationView.visibility = android.view.View.GONE
                 }
                 else -> {
-
                     binding.bottomNavigationView.visibility = android.view.View.VISIBLE
                 }
             }

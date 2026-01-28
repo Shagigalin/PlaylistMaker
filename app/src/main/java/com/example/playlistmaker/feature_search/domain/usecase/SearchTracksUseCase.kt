@@ -1,7 +1,8 @@
 package com.example.playlistmaker.feature_search.domain.usecase
 
 import com.example.playlistmaker.feature_search.domain.model.Track
+import kotlinx.coroutines.flow.Flow
 
 interface SearchTracksUseCase {
-    suspend fun execute(query: String): List<Track>
+    fun execute(query: String): Flow<List<Track>>
 }

@@ -38,8 +38,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupViews() {
-        // Убираем кнопку назад
-        // binding.buttonBack.setOnClickListener { ... } - удаляем
+
 
         binding.temaButton.setOnClickListener {
             viewModel.toggleTheme()
