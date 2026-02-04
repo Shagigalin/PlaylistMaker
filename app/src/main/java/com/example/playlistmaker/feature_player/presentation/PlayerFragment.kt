@@ -23,7 +23,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private val args: PlayerFragmentArgs by navArgs()
 
-    // Вместо свойства используем локальную переменную
+
     private lateinit var currentTrack: Track
 
     private val viewModel: PlayerViewModel by viewModel(parameters = {
@@ -35,7 +35,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         _binding = FragmentPlayerBinding.bind(view)
 
         // Проверяем трек один раз при создании
-        if (args.track == null) {
+        if (false) {
             setupEmptyPlayer()
             return
         }

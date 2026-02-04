@@ -9,18 +9,21 @@ import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.usecase.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import com.example.playlistmaker.feature_search.domain.usecase.SearchTracksUseCase
-import com.example.playlistmaker.feature_search.domain.usecase.GetSearchHistoryUseCase
-import com.example.playlistmaker.feature_search.domain.usecase.AddToSearchHistoryUseCase
-import com.example.playlistmaker.feature_search.domain.usecase.ClearSearchHistoryUseCase
 
+@OptIn(kotlinx.coroutines.FlowPreview::class)
 class SearchViewModel(
     private val searchTracksUseCase: SearchTracksUseCase,
     private val getSearchHistoryUseCase: GetSearchHistoryUseCase,
     private val addToSearchHistoryUseCase: AddToSearchHistoryUseCase,
     private val clearSearchHistoryUseCase: ClearSearchHistoryUseCase
 ) : ViewModel() {
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 1000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
 
     private val _state = MutableLiveData<SearchState>(SearchState.Initial)
     val state: LiveData<SearchState> = _state
@@ -29,14 +32,33 @@ class SearchViewModel(
     val event: LiveData<SearchEvent> = _event
 
     private var searchJob: Job? = null
-    private val SEARCH_DEBOUNCE_DELAY = 1000L
+    private var clickDebounceJob: Job? = null
+
+    private var lastSearchQuery: String? = null
+    private var lastSearchResults: List<Track> = emptyList()
+
+    private val searchQuery = MutableStateFlow("")
 
     init {
         loadSearchHistory()
+        setupSearchFlow()
+    }
+
+    private fun setupSearchFlow() {
+        viewModelScope.launch {
+            searchQuery
+                .debounce(SEARCH_DEBOUNCE_DELAY)
+                .distinctUntilChanged()
+                .filter { query -> query.isNotEmpty() }
+                .collect { query ->
+                    performSearch(query)
+                }
+        }
     }
 
     fun search(query: String) {
-        searchJob?.cancel()
+
+        searchQuery.value = query
 
         if (query.isEmpty()) {
             showHistory()
@@ -50,34 +72,80 @@ class SearchViewModel(
             isError = false,
             isNoResults = false
         )
+    }
 
+    fun performSearchDirectly(query: String) {
+        lastSearchQuery = query
+        performSearch(query)
+    }
+
+    private fun performSearch(query: String) {
+        searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(SEARCH_DEBOUNCE_DELAY)
-            performSearch(query)
+            searchTracksUseCase.execute(query)
+                .onStart {
+                    _state.value = SearchState(
+                        isLoading = true,
+                        isSearching = true,
+                        isHistoryVisible = false,
+                        isError = false,
+                        isNoResults = false
+                    )
+                }
+                .catch { e ->
+                    lastSearchResults = emptyList()
+                    _state.value = SearchState(
+                        isLoading = false,
+                        isError = true,
+                        isSearching = false,
+                        isHistoryVisible = false,
+                        tracks = emptyList()
+                    )
+                    _event.value = SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}")
+                }
+                .collect { tracks ->
+                    lastSearchQuery = query
+                    lastSearchResults = tracks
+
+                    _state.value = SearchState(
+                        tracks = tracks,
+                        isLoading = false,
+                        isSearching = tracks.isNotEmpty(),
+                        isHistoryVisible = false,
+                        isNoResults = tracks.isEmpty()
+                    )
+                }
         }
     }
 
-    private suspend fun performSearch(query: String) {
-        try {
-            val tracks = searchTracksUseCase.execute(query)
-
-            _state.postValue(SearchState(
-                tracks = tracks,
-                isLoading = false,
-                isSearching = tracks.isNotEmpty(),
-                isHistoryVisible = false,
-                isNoResults = tracks.isEmpty()
-            ))
-        } catch (e: Exception) {
-            _state.postValue(SearchState(
-                isLoading = false,
-                isError = true,
-                isSearching = false
-            ))
-
-            _event.postValue(SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}"))
+    fun restorePreviousSearch() {
+        lastSearchQuery?.let { query ->
+            if (query.isNotEmpty()) {
+                _state.value = SearchState(
+                    tracks = lastSearchResults,
+                    isLoading = false,
+                    isSearching = lastSearchResults.isNotEmpty(),
+                    isHistoryVisible = false,
+                    isNoResults = lastSearchResults.isEmpty()
+                )
+            }
         }
     }
+
+    fun onTrackClick(track: Track) {
+
+        clickDebounceJob?.cancel()
+        clickDebounceJob = viewModelScope.launch {
+            addToHistory(track)
+            _event.value = SearchEvent(navigateToPlayer = track)
+
+
+            delay(CLICK_DEBOUNCE_DELAY)
+        }
+    }
+
+
+
 
     fun addToHistory(track: Track) {
         viewModelScope.launch {
@@ -111,7 +179,6 @@ class SearchViewModel(
             val history = getSearchHistoryUseCase.execute()
             val hasHistory = history.isNotEmpty()
 
-            // Обновляем только историю, не меняя другие состояния
             val currentState = _state.value
             if (currentState != null) {
                 _state.value = currentState.copy(history = history)
@@ -121,16 +188,6 @@ class SearchViewModel(
                     isHistoryVisible = hasHistory
                 )
             }
-        }
-    }
-
-    fun navigateToPlayer(track: Track) {
-        viewModelScope.launch {
-            // Добавляем в историю
-            addToHistory(track)
-
-            // Создаем событие навигации
-            _event.value = SearchEvent(navigateToPlayer = track)
         }
     }
 }
