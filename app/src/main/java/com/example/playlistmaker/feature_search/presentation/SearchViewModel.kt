@@ -34,10 +34,12 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private var clickDebounceJob: Job? = null
 
-    private var lastSearchQuery: String? = null
-    private var lastSearchResults: List<Track> = emptyList()
 
     private val searchQuery = MutableStateFlow("")
+
+
+    private var lastSearchQuery: String? = null
+    private var lastSearchResults: List<Track> = emptyList()
 
     init {
         loadSearchHistory()
@@ -57,7 +59,6 @@ class SearchViewModel(
     }
 
     fun search(query: String) {
-
         searchQuery.value = query
 
         if (query.isEmpty()) {
@@ -74,11 +75,6 @@ class SearchViewModel(
         )
     }
 
-    fun performSearchDirectly(query: String) {
-        lastSearchQuery = query
-        performSearch(query)
-    }
-
     private fun performSearch(query: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -93,7 +89,6 @@ class SearchViewModel(
                     )
                 }
                 .catch { e ->
-                    lastSearchResults = emptyList()
                     _state.value = SearchState(
                         isLoading = false,
                         isError = true,
@@ -118,34 +113,27 @@ class SearchViewModel(
         }
     }
 
+
     fun restorePreviousSearch() {
-        lastSearchQuery?.let { query ->
-            if (query.isNotEmpty()) {
-                _state.value = SearchState(
-                    tracks = lastSearchResults,
-                    isLoading = false,
-                    isSearching = lastSearchResults.isNotEmpty(),
-                    isHistoryVisible = false,
-                    isNoResults = lastSearchResults.isEmpty()
-                )
-            }
+        if (lastSearchQuery != null && lastSearchResults.isNotEmpty()) {
+            _state.value = SearchState(
+                tracks = lastSearchResults,
+                isLoading = false,
+                isSearching = true,
+                isHistoryVisible = false,
+                isNoResults = lastSearchResults.isEmpty()
+            )
         }
     }
 
     fun onTrackClick(track: Track) {
-
         clickDebounceJob?.cancel()
         clickDebounceJob = viewModelScope.launch {
             addToHistory(track)
             _event.value = SearchEvent(navigateToPlayer = track)
-
-
             delay(CLICK_DEBOUNCE_DELAY)
         }
     }
-
-
-
 
     fun addToHistory(track: Track) {
         viewModelScope.launch {
@@ -163,30 +151,30 @@ class SearchViewModel(
 
     fun showHistory() {
         viewModelScope.launch {
-            val history = getSearchHistoryUseCase.execute()
-            val hasHistory = history.isNotEmpty()
-
-            _state.value = SearchState(
-                history = history,
-                isHistoryVisible = hasHistory,
-                isSearching = false
-            )
+            getSearchHistoryUseCase.execute().collect { history ->
+                val hasHistory = history.isNotEmpty()
+                _state.value = SearchState(
+                    history = history,
+                    isHistoryVisible = hasHistory,
+                    isSearching = false
+                )
+            }
         }
     }
 
     fun loadSearchHistory() {
         viewModelScope.launch {
-            val history = getSearchHistoryUseCase.execute()
-            val hasHistory = history.isNotEmpty()
-
-            val currentState = _state.value
-            if (currentState != null) {
-                _state.value = currentState.copy(history = history)
-            } else {
-                _state.value = SearchState(
-                    history = history,
-                    isHistoryVisible = hasHistory
-                )
+            getSearchHistoryUseCase.execute().collect { history ->
+                val hasHistory = history.isNotEmpty()
+                val currentState = _state.value
+                if (currentState != null) {
+                    _state.value = currentState.copy(history = history)
+                } else {
+                    _state.value = SearchState(
+                        history = history,
+                        isHistoryVisible = hasHistory
+                    )
+                }
             }
         }
     }

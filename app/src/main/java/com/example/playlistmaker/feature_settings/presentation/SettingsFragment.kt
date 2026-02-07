@@ -9,10 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSettingsBinding
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : Fragment() {
@@ -50,14 +48,20 @@ class SettingsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.observe(viewLifecycleOwner) { state ->
-                updateUI(state)
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            updateUI(state)
+        }
+
+        viewModel.shouldRecreate.observe(viewLifecycleOwner) { shouldRecreate ->
+            if (shouldRecreate == true) {
+                requireActivity().recreate()
+                viewModel.onRecreated()
             }
         }
     }
 
     private fun updateUI(state: SettingsState) {
+        // Обновляем иконку темы
         val iconRes = if (state.isDarkTheme) R.drawable.on else R.drawable.off
         binding.temaButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
             null,

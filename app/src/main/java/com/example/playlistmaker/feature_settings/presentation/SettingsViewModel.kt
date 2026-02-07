@@ -24,7 +24,7 @@ class SettingsViewModel(
 
     init {
         loadSettings()
-        applySavedTheme()
+
     }
 
     private fun loadSettings() = viewModelScope.launch {
@@ -38,27 +38,24 @@ class SettingsViewModel(
         }
     }
 
-    private fun applySavedTheme() = viewModelScope.launch {
-        try {
-            val theme = getThemeUseCase.execute()
-            val isDarkTheme = theme == ThemeSettings.DARK
-            applyTheme(isDarkTheme)
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-
-        }
-    }
-
     fun toggleTheme() = viewModelScope.launch {
         val currentState = _state.value ?: SettingsState()
         val newIsDarkTheme = !currentState.isDarkTheme
         val newTheme = if (newIsDarkTheme) ThemeSettings.DARK else ThemeSettings.LIGHT
 
         try {
+
             setThemeUseCase.execute(newTheme)
-            applyTheme(newIsDarkTheme)
+
+
             _state.value = currentState.copy(isDarkTheme = newIsDarkTheme)
+
+
+            applyTheme(newIsDarkTheme)
+
+
             _shouldRecreate.value = true
+
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             _state.value = currentState.copy(error = e.message)

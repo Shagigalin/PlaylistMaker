@@ -19,7 +19,8 @@ val playerModule = module {
         PlayerViewModel(
             track = track,
             playerControlsUseCase = get(),
-            timeFormatterUseCase = get()
+            timeFormatterUseCase = get(),
+            favoriteTracksUseCase = get()
         )
     }
 }

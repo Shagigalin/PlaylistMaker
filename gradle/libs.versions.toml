@@ -16,7 +16,7 @@ retrofit = "2.9.0"
 converterGson = "2.9.0"
 glideTransformations = "4.3.0"
 composeIcons = "1.5.4"
-
+room = "2.6.1"
 
 lifecycle = "2.7.0"
 coroutines = "1.7.3"
@@ -81,6 +81,13 @@ compose-icons-core = { group = "androidx.compose.material", name = "material-ico
 
 # Other
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
+# Room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

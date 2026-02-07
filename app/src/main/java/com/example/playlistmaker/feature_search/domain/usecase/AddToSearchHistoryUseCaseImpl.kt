@@ -6,7 +6,7 @@ import com.example.playlistmaker.feature_search.domain.repository.SearchHistoryR
 class AddToSearchHistoryUseCaseImpl(
     private val searchHistoryRepository: SearchHistoryRepository
 ) : AddToSearchHistoryUseCase {
-    override fun execute(track: Track) {
-        searchHistoryRepository.addTrackToHistory(track)
+    override suspend fun execute(track: Track) {
+        searchHistoryRepository.addToHistory(track)
     }
 }

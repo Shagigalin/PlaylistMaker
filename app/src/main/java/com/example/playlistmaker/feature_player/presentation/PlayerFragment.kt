@@ -11,7 +11,6 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
-import com.example.playlistmaker.feature_search.domain.model.Track
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -23,9 +22,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     private val args: PlayerFragmentArgs by navArgs()
 
-
-    private lateinit var currentTrack: Track
-
     private val viewModel: PlayerViewModel by viewModel(parameters = {
         parametersOf(args.track)
     })
@@ -34,27 +30,23 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPlayerBinding.bind(view)
 
-        // Проверяем трек один раз при создании
-        if (false) {
+
+        val track = args.track
+        if (track == null) {
             setupEmptyPlayer()
             return
         }
 
-        // Сохраняем трек в переменную
-        currentTrack = args.track!!
         setupPlayerWithTrack()
     }
 
     private fun setupPlayerWithTrack() {
-        // Настройка с треком
         setupViews()
-        setupTrackInfo(currentTrack)
         observeViewModel()
         enablePlayerControls()
     }
 
     private fun setupEmptyPlayer() {
-        // Настройка пустого плеера
         showEmptyPlayerState()
         setupEmptyControls()
     }
@@ -73,7 +65,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
 
         binding.btnAddToFavorites.setOnClickListener {
-            showToast("Добавить в избранное")
+            viewModel.toggleFavorite()
         }
     }
 
@@ -82,7 +74,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             findNavController().navigateUp()
         }
 
-        // Устанавливаем сообщения для кнопок
         binding.btnPlayPause.setOnClickListener {
             showToast("Выберите трек в поиске")
         }
@@ -95,11 +86,26 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             showToast("Выберите трек в поиске")
         }
 
-        // Отключаем кнопки
         disablePlayerControls()
     }
 
-    private fun setupTrackInfo(track: Track) {
+    private fun observeViewModel() {
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            updateUI(state)
+        }
+    }
+
+    private fun updateUI(state: PlayerUiState) {
+        val track = state.track ?: return
+
+        updateTrackInfo(track)
+        updatePlaybackState(state)
+        updateFavoriteButton(track)
+        handleErrors(state)
+    }
+
+    private fun updateTrackInfo(track: com.example.playlistmaker.feature_search.domain.model.Track) {
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.durationValue.text = track.getFormattedTime()
@@ -110,7 +116,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         binding.currentTime.isVisible = true
     }
 
-    private fun setupAlbumCover(track: Track) {
+    private fun setupAlbumCover(track: com.example.playlistmaker.feature_search.domain.model.Track) {
         val artworkUrl = track.getCoverArtwork()
         if (artworkUrl.isNotEmpty()) {
             Glide.with(this)
@@ -123,7 +129,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun setupTrackDetails(track: Track) {
+    private fun setupTrackDetails(track: com.example.playlistmaker.feature_search.domain.model.Track) {
         // Альбом
         val hasAlbum = !track.collectionName.isNullOrEmpty()
         binding.albumContainer.isVisible = hasAlbum
@@ -138,6 +144,25 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         // Жанр и страна
         binding.genreValue.text = track.primaryGenreName ?: getString(R.string.unknown)
         binding.countryValue.text = track.country ?: getString(R.string.unknown)
+    }
+
+    private fun updatePlaybackState(state: PlayerUiState) {
+        val playPauseIcon = if (state.isPlaying) R.drawable.pause else R.drawable.play
+        binding.btnPlayPause.setImageResource(playPauseIcon)
+
+        binding.currentTime.text = state.currentTime
+        binding.loadingProgressBar.isVisible = state.isLoading
+
+        binding.btnPlayPause.isEnabled = state.isPrepared
+    }
+
+    private fun updateFavoriteButton(track: com.example.playlistmaker.feature_search.domain.model.Track) {
+        val favoriteIcon = if (track.isFavorite) {
+            R.drawable.like_active
+        } else {
+            R.drawable.izbran
+        }
+        binding.btnAddToFavorites.setImageResource(favoriteIcon)
     }
 
     private fun showEmptyPlayerState() {
@@ -167,31 +192,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         binding.btnAddToPlaylist.isEnabled = false
         binding.btnAddToFavorites.isEnabled = false
         binding.btnPlayPause.setImageResource(R.drawable.play)
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.state.observe(viewLifecycleOwner) { state ->
-                updateUI(state)
-            }
-        }
-    }
-
-    private fun updateUI(state: PlayerUiState) {
-        // Обновляем только динамические элементы
-        updatePlaybackState(state)
-        handleErrors(state)
-    }
-
-    private fun updatePlaybackState(state: PlayerUiState) {
-        val playPauseIcon = if (state.isPlaying) R.drawable.pause else R.drawable.play
-        binding.btnPlayPause.setImageResource(playPauseIcon)
-
-        binding.currentTime.text = state.currentTime
-        binding.loadingProgressBar.isVisible = state.isLoading
-
-        // Кнопка доступна только если плеер готов
-        binding.btnPlayPause.isEnabled = state.isPrepared
     }
 
     private fun handleErrors(state: PlayerUiState) {

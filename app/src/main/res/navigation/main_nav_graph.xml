@@ -49,4 +49,20 @@
 
     </fragment>
 
+    <!-- Фрагмент избранных треков -->
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.playlistmaker.feature_medialibrary.presentation.favorites.FavoritesFragment"
+        android:label="Избранные треки"
+        tools:layout="@layout/fragment_favorites">
+
+
+
+        <!-- Навигация к плееру -->
+        <action
+            android:id="@+id/action_favoritesFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+
+    </fragment>
+
 </navigation>

@@ -4,36 +4,36 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.usecase.FavoriteTracksUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.PlayerControlsUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseCase
 import com.example.playlistmaker.feature_search.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val track: Track?,
     private val playerControlsUseCase: PlayerControlsUseCase,
-    private val timeFormatterUseCase: TimeFormatterUseCase
+    private val timeFormatterUseCase: TimeFormatterUseCase,
+    private val favoriteTracksUseCase: FavoriteTracksUseCase
 ) : ViewModel() {
 
     companion object {
         private const val UPDATE_INTERVAL_MS = 300L
     }
 
-    private val _state = MutableLiveData<PlayerUiState>(
-        PlayerUiState(
-            track = track,
-            isPrepared = track?.previewUrl == null
-        )
-    )
+    private val _state = MutableLiveData<PlayerUiState>()
     val state: LiveData<PlayerUiState> = _state
 
     private var progressUpdateJob: Job? = null
 
     init {
+        _state.value = PlayerUiState(
+            track = track,
+            isPrepared = track?.previewUrl == null
+        )
+
         track?.previewUrl?.let { previewUrl ->
             _state.value = _state.value?.copy(isLoading = true)
             playerControlsUseCase.prepareMediaPlayer(previewUrl)
@@ -63,16 +63,45 @@ class PlayerViewModel(
             isPrepared = playerState.isPrepared
         )
 
-        // Управляем обновлением прогресса
         when {
             playerState.isPlaying -> startProgressUpdates()
             !playerState.isPlaying -> stopProgressUpdates()
             playerState.currentPosition == 0 && !playerState.isPlaying -> {
-                // Воспроизведение завершено, сбрасываем прогресс
                 stopProgressUpdates()
                 _state.value = currentState.copy(
                     currentTime = "00:00",
                     isPlaying = false
+                )
+            }
+        }
+    }
+
+
+    fun toggleFavorite() {
+        val currentState = _state.value ?: return
+        val currentTrack = currentState.track ?: return
+
+        viewModelScope.launch {
+            try {
+                if (currentTrack.isFavorite) {
+
+                    favoriteTracksUseCase.removeFromFavorites(currentTrack)
+
+                    _state.value = currentState.copy(
+                        track = currentTrack.copy(isFavorite = false)
+                    )
+                } else {
+
+                    favoriteTracksUseCase.addToFavorites(currentTrack)
+
+                    _state.value = currentState.copy(
+                        track = currentTrack.copy(isFavorite = true)
+                    )
+                }
+            } catch (e: Exception) {
+
+                _state.value = currentState.copy(
+                    error = "Ошибка при сохранении в избранное: ${e.message}"
                 )
             }
         }
