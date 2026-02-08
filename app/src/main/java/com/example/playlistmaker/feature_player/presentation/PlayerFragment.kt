@@ -75,15 +75,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
 
         binding.btnPlayPause.setOnClickListener {
-            showToast("Выберите трек в поиске")
+            Toast.makeText(requireContext(), R.string.select_track_in_search, Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddToPlaylist.setOnClickListener {
-            showToast("Выберите трек в поиске")
+            Toast.makeText(requireContext(), R.string.select_track_in_search, Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddToFavorites.setOnClickListener {
-            showToast("Выберите трек в поиске")
+            Toast.makeText(requireContext(), R.string.select_track_in_search, Toast.LENGTH_SHORT).show()
         }
 
         disablePlayerControls()

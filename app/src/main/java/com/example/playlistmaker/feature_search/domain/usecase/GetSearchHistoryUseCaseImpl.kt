@@ -5,9 +5,10 @@ import com.example.playlistmaker.feature_search.domain.repository.SearchHistoryR
 import kotlinx.coroutines.flow.Flow
 
 class GetSearchHistoryUseCaseImpl(
-    private val searchHistoryRepository: SearchHistoryRepository
+    private val repository: SearchHistoryRepository
 ) : GetSearchHistoryUseCase {
+
     override fun execute(): Flow<List<Track>> {
-        return searchHistoryRepository.getSearchHistory()
+        return repository.getSearchHistory()
     }
 }

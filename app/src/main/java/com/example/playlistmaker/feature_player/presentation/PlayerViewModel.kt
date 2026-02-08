@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.usecase.FavoriteTracksUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.PlayerControlsUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseCase
@@ -78,33 +79,36 @@ class PlayerViewModel(
 
 
     fun toggleFavorite() {
-        val currentState = _state.value ?: return
-        val currentTrack = currentState.track ?: return
-
+        val currentTrack = _state.value?.track ?: return
         viewModelScope.launch {
-            try {
-                if (currentTrack.isFavorite) {
-
+            if (currentTrack.isFavorite) {
+                try {
                     favoriteTracksUseCase.removeFromFavorites(currentTrack)
-
-                    _state.value = currentState.copy(
+                    _state.value = _state.value?.copy(
                         track = currentTrack.copy(isFavorite = false)
                     )
-                } else {
-
-                    favoriteTracksUseCase.addToFavorites(currentTrack)
-
-                    _state.value = currentState.copy(
-                        track = currentTrack.copy(isFavorite = true)
+                } catch (e: Exception) {
+                    _state.value = _state.value?.copy(
+                        error = requireContext().getString(R.string.error_removing_from_favorites)
                     )
                 }
-            } catch (e: Exception) {
-
-                _state.value = currentState.copy(
-                    error = "Ошибка при сохранении в избранное: ${e.message}"
-                )
+            } else {
+                try {
+                    favoriteTracksUseCase.addToFavorites(currentTrack)
+                    _state.value = _state.value?.copy(
+                        track = currentTrack.copy(isFavorite = true)
+                    )
+                } catch (e: Exception) {
+                    _state.value = _state.value?.copy(
+                        error = requireContext().getString(R.string.error_adding_to_favorites)
+                    )
+                }
             }
         }
+    }
+
+    private fun requireContext(): android.content.Context {
+        return android.app.Application().applicationContext
     }
 
     private fun startProgressUpdates() {

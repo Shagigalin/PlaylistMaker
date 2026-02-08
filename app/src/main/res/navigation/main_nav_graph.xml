@@ -3,14 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/searchFragment">
+    app:startDestination="@id/mediaLibraryFragment">
 
-    <!-- Основные экраны с BottomNavigationView -->
+
     <fragment
         android:id="@+id/mediaLibraryFragment"
         android:name="com.example.playlistmaker.feature_medialibrary.presentation.MediaLibraryFragment"
         android:label="@string/media"
-        tools:layout="@layout/fragment_media_library" />
+        tools:layout="@layout/fragment_media_library">
+
+    <action
+        android:id="@+id/action_mediaLibraryFragment_to_playerFragment"
+        app:destination="@id/playerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchFragment"
@@ -49,20 +54,6 @@
 
     </fragment>
 
-    <!-- Фрагмент избранных треков -->
-    <fragment
-        android:id="@+id/favoritesFragment"
-        android:name="com.example.playlistmaker.feature_medialibrary.presentation.favorites.FavoritesFragment"
-        android:label="Избранные треки"
-        tools:layout="@layout/fragment_favorites">
 
-
-
-        <!-- Навигация к плееру -->
-        <action
-            android:id="@+id/action_favoritesFragment_to_playerFragment"
-            app:destination="@id/playerFragment" />
-
-    </fragment>
 
 </navigation>

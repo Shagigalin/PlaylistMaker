@@ -13,6 +13,7 @@ import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.presentation.SearchAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.playlistmaker.R
+import com.example.playlistmaker.feature_medialibrary.presentation.MediaLibraryFragmentDirections
 
 class FavoritesFragment : Fragment() {
 
@@ -83,22 +84,9 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun navigateToPlayer(track: Track) {
-        try {
 
-            val action = FavoritesFragmentDirections.actionFavoritesFragmentToPlayerFragment(track)
-            findNavController().navigate(action)
-        } catch (e: Exception) {
-            e.printStackTrace()
-
-            try {
-                val bundle = Bundle().apply {
-                    putParcelable("track", track)
-                }
-                findNavController().navigate(R.id.playerFragment, bundle)
-            } catch (e2: Exception) {
-                e2.printStackTrace()
-            }
-        }
+        val action = MediaLibraryFragmentDirections.actionMediaLibraryFragmentToPlayerFragment(track)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

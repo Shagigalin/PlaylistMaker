@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class SearchHistoryRepositoryImpl(
     private val storage: SharedPreferencesStorage,
@@ -17,50 +18,62 @@ class SearchHistoryRepositoryImpl(
 
     companion object {
         private const val HISTORY_KEY = "search_history"
+        private const val MAX_HISTORY_SIZE = 10
     }
 
     override fun getSearchHistory(): Flow<List<Track>> = flow {
         val json = storage.getHistory()
-        if (json.isNotEmpty()) {
+        emit(if (json.isNotEmpty()) {
             try {
-                val tracks = gson.fromJson(json, Array<Track>::class.java).toList()
-
-
-                val favoriteIds = try {
-                    favoriteTracksDao.getAllIds().first()
-                } catch (e: Exception) {
-                    emptyList()
-                }
-
-
-                val updatedTracks = tracks.map { track ->
-                    track.apply {
-                        isFavorite = favoriteIds.contains(trackId)
-                    }
-                }
-
-                emit(updatedTracks)
+                gson.fromJson(json, Array<Track>::class.java).toList()
             } catch (e: Exception) {
-                emit(emptyList())
+                emptyList()
             }
         } else {
-            emit(emptyList())
+            emptyList()
+        })
+    }.map { tracks ->
+
+        val favoriteIds = try {
+            favoriteTracksDao.getAllIds().first()
+        } catch (e: Exception) {
+            emptyList()
+        }
+
+        tracks.map { track ->
+            track.apply {
+                isFavorite = trackId in favoriteIds
+            }
         }
     }
 
     override suspend fun addToHistory(track: Track) {
-        val currentHistory = getCurrentHistory()
-        val newHistory = currentHistory
-            .filter { it.trackId != track.trackId }
-            .toMutableList()
 
-        newHistory.add(0, track)
-
-        // Ограничиваем размер истории
-        if (newHistory.size > 10) {
-            newHistory.removeLast()
+        val currentHistory = try {
+            getSearchHistory().first()
+        } catch (e: Exception) {
+            emptyList()
         }
 
+
+        val newHistory = mutableListOf<Track>().apply {
+
+            add(track.copy())
+
+
+            currentHistory.forEach { existingTrack ->
+                if (existingTrack.trackId != track.trackId) {
+                    add(existingTrack.copy())
+                }
+            }
+
+
+            if (size > MAX_HISTORY_SIZE) {
+                removeLast()
+            }
+        }
+
+        // Сохраняем историю
         saveHistory(newHistory)
     }
 
@@ -68,16 +81,13 @@ class SearchHistoryRepositoryImpl(
         saveHistory(emptyList())
     }
 
-    private suspend fun getCurrentHistory(): List<Track> {
-        return try {
-            getSearchHistory().first()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
     private fun saveHistory(tracks: List<Track>) {
-        val json = gson.toJson(tracks)
-        storage.saveHistory(json)
+        try {
+            val json = gson.toJson(tracks)
+            storage.saveHistory(json)
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+        }
     }
 }

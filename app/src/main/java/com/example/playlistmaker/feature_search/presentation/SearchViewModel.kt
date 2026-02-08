@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.core.utils.SingleLiveEvent
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.usecase.*
@@ -34,9 +35,7 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private var clickDebounceJob: Job? = null
 
-
     private val searchQuery = MutableStateFlow("")
-
 
     private var lastSearchQuery: String? = null
     private var lastSearchResults: List<Track> = emptyList()
@@ -96,7 +95,8 @@ class SearchViewModel(
                         isHistoryVisible = false,
                         tracks = emptyList()
                     )
-                    _event.value = SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}")
+
+                    _event.value = SearchEvent(errorMessage = getString(R.string.search_error, e.localizedMessage))
                 }
                 .collect { tracks ->
                     lastSearchQuery = query
@@ -113,16 +113,17 @@ class SearchViewModel(
         }
     }
 
-
     fun restorePreviousSearch() {
-        if (lastSearchQuery != null && lastSearchResults.isNotEmpty()) {
-            _state.value = SearchState(
-                tracks = lastSearchResults,
-                isLoading = false,
-                isSearching = true,
-                isHistoryVisible = false,
-                isNoResults = lastSearchResults.isEmpty()
-            )
+        lastSearchQuery?.let { query ->
+            if (query.isNotEmpty() && lastSearchResults.isNotEmpty()) {
+                _state.value = SearchState(
+                    tracks = lastSearchResults,
+                    isLoading = false,
+                    isSearching = true,
+                    isHistoryVisible = false,
+                    isNoResults = lastSearchResults.isEmpty()
+                )
+            }
         }
     }
 
@@ -177,5 +178,12 @@ class SearchViewModel(
                 }
             }
         }
+    }
+
+
+    private fun getString(resId: Int, vararg formatArgs: Any): String {
+
+        val context = android.app.Application().applicationContext
+        return context.getString(resId, *formatArgs)
     }
 }
