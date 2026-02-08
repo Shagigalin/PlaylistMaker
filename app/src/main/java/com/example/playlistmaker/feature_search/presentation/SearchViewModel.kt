@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.core.utils.SingleLiveEvent
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.usecase.*
@@ -34,10 +35,10 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private var clickDebounceJob: Job? = null
 
+    private val searchQuery = MutableStateFlow("")
+
     private var lastSearchQuery: String? = null
     private var lastSearchResults: List<Track> = emptyList()
-
-    private val searchQuery = MutableStateFlow("")
 
     init {
         loadSearchHistory()
@@ -57,7 +58,6 @@ class SearchViewModel(
     }
 
     fun search(query: String) {
-
         searchQuery.value = query
 
         if (query.isEmpty()) {
@@ -74,11 +74,6 @@ class SearchViewModel(
         )
     }
 
-    fun performSearchDirectly(query: String) {
-        lastSearchQuery = query
-        performSearch(query)
-    }
-
     private fun performSearch(query: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -93,7 +88,6 @@ class SearchViewModel(
                     )
                 }
                 .catch { e ->
-                    lastSearchResults = emptyList()
                     _state.value = SearchState(
                         isLoading = false,
                         isError = true,
@@ -101,7 +95,8 @@ class SearchViewModel(
                         isHistoryVisible = false,
                         tracks = emptyList()
                     )
-                    _event.value = SearchEvent(errorMessage = "Ошибка поиска: ${e.localizedMessage}")
+
+                    _event.value = SearchEvent(errorMessage = getString(R.string.search_error, e.localizedMessage))
                 }
                 .collect { tracks ->
                     lastSearchQuery = query
@@ -120,11 +115,11 @@ class SearchViewModel(
 
     fun restorePreviousSearch() {
         lastSearchQuery?.let { query ->
-            if (query.isNotEmpty()) {
+            if (query.isNotEmpty() && lastSearchResults.isNotEmpty()) {
                 _state.value = SearchState(
                     tracks = lastSearchResults,
                     isLoading = false,
-                    isSearching = lastSearchResults.isNotEmpty(),
+                    isSearching = true,
                     isHistoryVisible = false,
                     isNoResults = lastSearchResults.isEmpty()
                 )
@@ -133,19 +128,13 @@ class SearchViewModel(
     }
 
     fun onTrackClick(track: Track) {
-
         clickDebounceJob?.cancel()
         clickDebounceJob = viewModelScope.launch {
             addToHistory(track)
             _event.value = SearchEvent(navigateToPlayer = track)
-
-
             delay(CLICK_DEBOUNCE_DELAY)
         }
     }
-
-
-
 
     fun addToHistory(track: Track) {
         viewModelScope.launch {
@@ -163,31 +152,38 @@ class SearchViewModel(
 
     fun showHistory() {
         viewModelScope.launch {
-            val history = getSearchHistoryUseCase.execute()
-            val hasHistory = history.isNotEmpty()
-
-            _state.value = SearchState(
-                history = history,
-                isHistoryVisible = hasHistory,
-                isSearching = false
-            )
+            getSearchHistoryUseCase.execute().collect { history ->
+                val hasHistory = history.isNotEmpty()
+                _state.value = SearchState(
+                    history = history,
+                    isHistoryVisible = hasHistory,
+                    isSearching = false
+                )
+            }
         }
     }
 
     fun loadSearchHistory() {
         viewModelScope.launch {
-            val history = getSearchHistoryUseCase.execute()
-            val hasHistory = history.isNotEmpty()
-
-            val currentState = _state.value
-            if (currentState != null) {
-                _state.value = currentState.copy(history = history)
-            } else {
-                _state.value = SearchState(
-                    history = history,
-                    isHistoryVisible = hasHistory
-                )
+            getSearchHistoryUseCase.execute().collect { history ->
+                val hasHistory = history.isNotEmpty()
+                val currentState = _state.value
+                if (currentState != null) {
+                    _state.value = currentState.copy(history = history)
+                } else {
+                    _state.value = SearchState(
+                        history = history,
+                        isHistoryVisible = hasHistory
+                    )
+                }
             }
         }
+    }
+
+
+    private fun getString(resId: Int, vararg formatArgs: Any): String {
+
+        val context = android.app.Application().applicationContext
+        return context.getString(resId, *formatArgs)
     }
 }

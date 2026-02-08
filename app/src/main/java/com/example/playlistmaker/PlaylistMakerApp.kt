@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.data.di.*
+import com.example.playlistmaker.domain.di.useCaseModule
 import com.example.playlistmaker.feature_medialibrary.di.mediaLibraryModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -27,11 +28,13 @@ class PlaylistMakerApp : Application() {
             androidContext(this@PlaylistMakerApp)
             modules(
                 appModule,
-                mainModule,
+                databaseModule,
+                repositoryModule,
+                useCaseModule,
                 searchModule,
                 playerModule,
-                settingsModule,
-                mediaLibraryModule)
+                mediaLibraryModule,
+                settingsModule)
         }
 
         // Применение темы

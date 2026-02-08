@@ -3,6 +3,7 @@ package com.example.playlistmaker.feature_main.presentation
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -10,12 +11,18 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.example.playlistmaker.feature_settings.domain.model.ThemeSettings
+import com.example.playlistmaker.feature_settings.domain.usecase.GetThemeUseCaseInterface
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val getThemeUseCase: GetThemeUseCaseInterface by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        applySavedTheme()
 
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -25,7 +32,15 @@ class MainActivity : AppCompatActivity() {
 
         setupStatusBarInsets()
         setupNavigation()
+    }
 
+    private fun applySavedTheme() {
+        val theme = getThemeUseCase.execute()
+        val isDarkTheme = theme == ThemeSettings.DARK
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkTheme) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
     }
 
     private fun setupStatusBarInsets() {

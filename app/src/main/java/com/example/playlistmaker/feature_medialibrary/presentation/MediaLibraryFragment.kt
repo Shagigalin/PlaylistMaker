@@ -14,6 +14,9 @@ class MediaLibraryFragment : Fragment() {
     private var _binding: FragmentMediaLibraryBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var viewPager: ViewPager2
+    private lateinit var pagerAdapter: MediaLibraryPagerAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,14 +32,15 @@ class MediaLibraryFragment : Fragment() {
     }
 
     private fun setupViewPager() {
-        val adapter = MediaLibraryPagerAdapter(requireActivity())
-        binding.viewPager.adapter = adapter
+        pagerAdapter = MediaLibraryPagerAdapter(childFragmentManager, lifecycle)
+        viewPager = binding.viewPager
+        viewPager.adapter = pagerAdapter
 
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+        TabLayoutMediator(binding.tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(com.example.playlistmaker.R.string.favorite_tracks)
-                else -> getString(com.example.playlistmaker.R.string.playlists)
-
+                1 -> getString(com.example.playlistmaker.R.string.playlists)
+                else -> ""
             }
         }.attach()
     }

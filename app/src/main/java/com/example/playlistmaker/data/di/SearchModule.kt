@@ -47,15 +47,20 @@ val searchModule = module {
     // 2. Repositories
     factory<TrackRepository> {
         TrackRepositorySimple(
-            iTunesApi = get<ITunesApi>()
+            iTunesApi = get<ITunesApi>(),
+            favoriteTracksDao = get()
         )
     }
 
     single<SearchHistoryRepository> {
-        SearchHistoryRepositoryImpl(get()) // зависит от SharedPreferencesStorage
+        SearchHistoryRepositoryImpl(
+            storage = get(),
+            favoriteTracksDao = get(),
+            gson = get()
+        )
     }
 
-    // 3. Use Cases - factory (создаются каждый раз новые)
+    // 3. Use Cases - factory
     factory<SearchTracksUseCase> {
         SearchTracksUseCaseImpl(
             trackRepository = get()
@@ -63,24 +68,25 @@ val searchModule = module {
     }
 
     factory<GetSearchHistoryUseCase> {
-        GetSearchHistoryUseCaseImpl(get()) // зависит от SearchHistoryRepository
+        GetSearchHistoryUseCaseImpl(get())
     }
 
     factory<AddToSearchHistoryUseCase> {
-        AddToSearchHistoryUseCaseImpl(get()) // зависит от SearchHistoryRepository
+        AddToSearchHistoryUseCaseImpl(get())
     }
 
     factory<ClearSearchHistoryUseCase> {
-        ClearSearchHistoryUseCaseImpl(get()) // зависит от SearchHistoryRepository
+        ClearSearchHistoryUseCaseImpl(get())
     }
 
-    // 4. ViewModel
+
     viewModel {
         SearchViewModel(
             searchTracksUseCase = get(),
             getSearchHistoryUseCase = get(),
             addToSearchHistoryUseCase = get(),
             clearSearchHistoryUseCase = get()
+
         )
     }
 }
