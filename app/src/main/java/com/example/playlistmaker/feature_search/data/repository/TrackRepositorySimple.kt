@@ -1,15 +1,18 @@
 package com.example.playlistmaker.feature_search.data.repository
 
+import com.example.playlistmaker.data.db.FavoriteTracksDao
 import com.example.playlistmaker.feature_search.data.network.ITunesApi
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.example.playlistmaker.feature_search.domain.repository.TrackRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.net.UnknownHostException
 
 class TrackRepositorySimple(
-    private val iTunesApi: ITunesApi
+    private val iTunesApi: ITunesApi,
+    private val favoriteTracksDao: FavoriteTracksDao
 ) : TrackRepository {
 
     override fun searchTracks(query: String): Flow<List<Track>> = flow {
@@ -25,7 +28,21 @@ class TrackRepositorySimple(
                 val responseBody = response.body()
 
                 if (responseBody != null && responseBody.results.isNotEmpty()) {
-                    val tracks = responseBody.results.map { it.toTrack() }
+                    // Получаем список ID избранных треков
+                    val favoriteIdsFlow = favoriteTracksDao.getAllIds()
+                    val favoriteIds = try {
+
+                        favoriteIdsFlow.firstOrNull() ?: emptyList()
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
+
+                    val tracks = responseBody.results.map { dto ->
+                        val track = dto.toTrack()
+                        track.isFavorite = track.trackId in favoriteIds
+                        track
+                    }
+
                     emit(tracks)
                 } else {
                     emit(emptyList())

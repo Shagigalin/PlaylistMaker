@@ -102,5 +102,20 @@
     <string name="player_no_track_subtitle">Выберите трек в поиске</string>
     <string name="player_select_track_message">Выберите трек в поиске</string>
 
+    <!-- Ошибки -->
+    <string name="error_adding_to_favorites">Не удалось добавить в избранное</string>
+    <string name="error_removing_from_favorites">Не удалось удалить из избранного</string>
+    <string name="error_playback">Ошибка воспроизведения</string>
+    <string name="error_loading_audio">Не удалось загрузить аудио</string>
+    <string name="search_error">Ошибка поиска: %s</string>
+
+    <!-- Сообщения для пользователя -->
+    <string name="select_track_in_search">Выберите трек в поиске</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+
+    <!-- Для плеера -->
+    <string name="player_error">Ошибка плеера</string>
+    <string name="player_state_illegal">Плеер в недопустимом состоянии</string>
+
 
 </resources>

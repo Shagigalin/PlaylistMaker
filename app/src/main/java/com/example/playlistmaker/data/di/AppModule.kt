@@ -27,8 +27,7 @@ val appModule = module {
         val sharedPreferences = androidContext()
             .getSharedPreferences("search_history", Context.MODE_PRIVATE)
         SharedPreferencesStorage(
-            sharedPreferences = sharedPreferences,
-            gson = get()
+            sharedPreferences = sharedPreferences
         )
     }
 

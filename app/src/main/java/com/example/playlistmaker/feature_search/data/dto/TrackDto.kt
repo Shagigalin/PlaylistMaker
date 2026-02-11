@@ -26,7 +26,8 @@ data class TrackDto(
             releaseDate = releaseDate,
             primaryGenreName = primaryGenreName,
             country = country,
-            previewUrl = previewUrl
+            previewUrl = previewUrl,
+            isFavorite = false
         )
     }
 }
