@@ -1,8 +1,9 @@
 package com.example.playlistmaker.feature_search.presentation
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.core.utils.SingleLiveEvent
@@ -18,8 +19,9 @@ class SearchViewModel(
     private val searchTracksUseCase: SearchTracksUseCase,
     private val getSearchHistoryUseCase: GetSearchHistoryUseCase,
     private val addToSearchHistoryUseCase: AddToSearchHistoryUseCase,
-    private val clearSearchHistoryUseCase: ClearSearchHistoryUseCase
-) : ViewModel() {
+    private val clearSearchHistoryUseCase: ClearSearchHistoryUseCase,
+    application: Application
+) : AndroidViewModel(application) {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 1000L
@@ -96,7 +98,12 @@ class SearchViewModel(
                         tracks = emptyList()
                     )
 
-                    _event.value = SearchEvent(errorMessage = getString(R.string.search_error, e.localizedMessage))
+                    _event.value = SearchEvent(
+                        errorMessage = getApplication<Application>().getString(
+                            R.string.search_error,
+                            e.localizedMessage ?: "Unknown error"
+                        )
+                    )
                 }
                 .collect { tracks ->
                     lastSearchQuery = query
@@ -178,12 +185,5 @@ class SearchViewModel(
                 }
             }
         }
-    }
-
-
-    private fun getString(resId: Int, vararg formatArgs: Any): String {
-
-        val context = android.app.Application().applicationContext
-        return context.getString(resId, *formatArgs)
     }
 }

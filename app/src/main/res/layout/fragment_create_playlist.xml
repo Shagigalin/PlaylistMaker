@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorOnPrimary"
+    android:orientation="vertical">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/colorOnPrimary"
+        app:navigationIcon="@drawable/strel"
+        app:navigationIconTint="?attr/android:textColorPrimary"
+        app:title="@string/new_playlist"
+        app:titleTextAppearance="@style/ToolbarTitleTextAppearance"
+        app:titleTextColor="?attr/android:textColorPrimary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="26dp"
+            android:gravity="center_horizontal"
+            >
+
+            <!-- Область для обложки -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cover_container"
+                android:layout_width="312dp"
+                android:layout_height="312dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorOnPrimaryContainer"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="33dp"
+                >
+
+                <FrameLayout
+                    android:layout_width="312dp"
+                    android:layout_height="312dp"
+                    android:background="@drawable/dashed_border"
+                    >
+
+                    <ImageView
+                        android:id="@+id/iv_cover"
+                        android:layout_width="312dp"
+                        android:layout_height="312dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        tools:src="@drawable/placeholder"
+                        tools:visibility="visible"
+                        />
+
+                    <LinearLayout
+                        android:id="@+id/cover_placeholder"
+                        android:layout_width="312dp"
+                        android:layout_height="312dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="visible"
+                        >
+
+                        <ImageView
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:src="@drawable/add_photo"
+                            app:tint="?attr/colorSurfaceVariant"
+                            android:gravity="center"/>
+
+
+                    </LinearLayout>
+
+                    <!-- ProgressBar для загрузки -->
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="?attr/colorPrimary"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Поле ввода названия -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/playlist_name"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="?attr/colorOnPrimaryContainer"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.TextInputLayout.Rounded"
+                app:boxStrokeColor="@color/box_stroke_color"
+                app:hintTextColor="?attr/colorSecondary"
+                android:layout_marginBottom="17dp"
+                android:textColorHint="?attr/colorPrimaryContainer"
+                android:gravity="center_vertical"
+
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:fontFamily="@font/ys_display_regular"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/sp16"
+                    android:textFontWeight="400"
+                    android:inputType="textCapSentences"
+                    android:textColor="?attr/colorPrimaryContainer"
+
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Поле ввода описания -->
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/playlist_description"
+                android:layout_marginBottom="24dp"
+                app:boxBackgroundMode="outline"
+                app:boxBackgroundColor="?attr/colorOnPrimaryContainer"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.TextInputLayout.Rounded"
+                app:boxStrokeColor="@color/box_stroke_color"
+                app:hintTextColor="?attr/colorSecondary"
+                android:textColorHint="?attr/colorPrimaryContainer"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:fontFamily="@font/ys_display_regular"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/sp16"
+                    android:textFontWeight="400"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLines="3"
+                    android:textColor="?attr/colorPrimaryContainer" />
+
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Кнопка Создать -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_create"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="170dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:enabled="false"
+        android:fontFamily="@font/ys_display_medium"
+
+        android:text="@string/create"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:cornerRadius="8dp"
+        app:backgroundTint="@color/button_color_selector"
+        app:elevation="0dp"/>
+
+</LinearLayout>

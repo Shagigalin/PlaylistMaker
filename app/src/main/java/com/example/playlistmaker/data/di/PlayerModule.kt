@@ -10,17 +10,18 @@ import org.koin.dsl.module
 val playerModule = module {
 
     factory { MediaPlayerProvider() }
-    // Use Cases
+
     factory { PlayerControlsUseCase(get()) }
+
     factory { TimeFormatterUseCase() }
 
-    // ViewModel
     viewModel { (track: com.example.playlistmaker.feature_search.domain.model.Track?) ->
         PlayerViewModel(
             track = track,
             playerControlsUseCase = get(),
             timeFormatterUseCase = get(),
-            favoriteTracksUseCase = get()
+            favoriteTracksUseCase = get(),
+            playlistUseCase = get()
         )
     }
 }

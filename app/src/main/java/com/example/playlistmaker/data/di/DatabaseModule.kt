@@ -8,5 +8,10 @@ import org.koin.dsl.module
 val databaseModule = module {
     single { AppDatabase.getInstance(androidContext()) }
 
+    // Existing DAOs
     single { get<AppDatabase>().favoriteTracksDao() }
+
+    // New DAOs
+    single { get<AppDatabase>().playlistDao() }
+    single { get<AppDatabase>().playlistTrackDao() }
 }
