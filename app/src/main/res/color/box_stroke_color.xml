@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!-- В фокусе -->
+    <item android:color="?attr/colorSecondary" android:state_focused="true"/>
+
+    <!-- Активное состояние (по умолчанию) -->
+    <item android:color="?attr/colorSecondary"/>
+</selector>

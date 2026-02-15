@@ -18,7 +18,7 @@ class MediaLibraryPagerAdapter(
         return when (position) {
             0 -> FavoritesFragment()
             1 -> PlaylistFragment()
-            else -> throw IllegalArgumentException("Invalid position: $position")
+            else -> throw IllegalArgumentException("Invalid position $position")
         }
     }
 }

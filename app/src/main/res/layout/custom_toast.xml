@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/snackbar"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorPrimaryContainer"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_toast_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnPrimaryContainer"
+        android:textSize="14sp"
+        android:fontFamily="@font/ys_display_medium"
+        android:gravity="center" />
+
+</RelativeLayout>

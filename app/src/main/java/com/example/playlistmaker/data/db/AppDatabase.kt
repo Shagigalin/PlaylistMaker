@@ -6,13 +6,19 @@ import androidx.room.RoomDatabase
 import android.content.Context
 
 @Database(
-    entities = [FavoriteTrackEntity::class],
-    version = 1,
+    entities = [
+        FavoriteTrackEntity::class,
+        PlaylistEntity::class,
+        PlaylistTrackEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun favoriteTracksDao(): FavoriteTracksDao
+    abstract fun playlistDao(): PlaylistDao
+    abstract fun playlistTrackDao(): PlaylistTrackDao
 
     companion object {
         @Volatile
@@ -29,7 +35,9 @@ abstract class AppDatabase : RoomDatabase() {
                 context,
                 AppDatabase::class.java,
                 "playlist_maker.db"
-            ).build()
+            )
+                .addMigrations(MIGRATION_1_2)
+                .build()
         }
     }
 }

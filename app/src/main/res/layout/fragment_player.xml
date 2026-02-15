@@ -1,343 +1,396 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="?attr/colorOnPrimary">
 
-    <LinearLayout
+    <!-- Основной контент плеера -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <!-- Кнопка назад -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/button_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:drawableStart="@drawable/strel"
-                android:drawablePadding="8dp"
-                android:drawableTint="?android:attr/textColorPrimary"
-                android:minHeight="48dp"
-                android:padding="8dp" />
-
-        </LinearLayout>
-
-        <!-- Обложка -->
-        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/album_cover"
-                android:layout_width="312dp"
-                android:layout_height="312dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="26dp"
-                android:background="@drawable/rounded_corners"
-                android:contentDescription="@string/album_cover_description"
-                android:scaleType="centerCrop"
-                android:src="@drawable/placeholder"
-                android:clipToOutline="true"/>
-
-            <!-- ProgressBar для загрузки аудио -->
-            <ProgressBar
-                android:id="@+id/loadingProgressBar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:visibility="gone"
-                android:indeterminateTint="?attr/colorPrimary"
-                app:layout_constraintTop_toTopOf="@id/album_cover"
-                app:layout_constraintBottom_toBottomOf="@id/album_cover"
-                app:layout_constraintStart_toStartOf="@id/album_cover"
-                app:layout_constraintEnd_toEndOf="@id/album_cover"/>
-
-            <!-- Название трека -->
-            <TextView
-                android:id="@+id/track_name"
-                android:layout_width="0dp"
+            <!-- Кнопка назад -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/album_cover"
-                app:layout_constraintEnd_toEndOf="@id/album_cover"
-                app:layout_constraintTop_toBottomOf="@id/album_cover"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/ys_display_medium"
-                android:textAlignment="viewStart"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="22sp"
-                tools:text="Название трека" />
+                android:gravity="center_vertical">
 
-            <!-- Имя исполнителя -->
-            <TextView
-                android:id="@+id/artist_name"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/button_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawableStart="@drawable/strel"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="?android:attr/textColorPrimary"
+                    android:minHeight="48dp"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+            <!-- Обложка -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/album_cover"
-                app:layout_constraintEnd_toEndOf="@id/album_cover"
-                app:layout_constraintTop_toBottomOf="@id/track_name"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/ys_display_medium"
-                android:textAlignment="viewStart"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                tools:text="Исполнитель" />
+                android:orientation="vertical">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/album_cover"
+                    android:layout_width="312dp"
+                    android:layout_height="312dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="26dp"
+                    android:background="@drawable/rounded_corners"
+                    android:contentDescription="@string/album_cover_description"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/placeholder"
+                    android:clipToOutline="true"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="30dp">
+                <!-- ProgressBar для загрузки аудио -->
+                <ProgressBar
+                    android:id="@+id/loadingProgressBar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="gone"
+                    android:indeterminateTint="?attr/colorPrimary"
+                    app:layout_constraintTop_toTopOf="@id/album_cover"
+                    app:layout_constraintBottom_toBottomOf="@id/album_cover"
+                    app:layout_constraintStart_toStartOf="@id/album_cover"
+                    app:layout_constraintEnd_toEndOf="@id/album_cover"/>
 
-            <!-- Левая кнопка -->
-            <ImageButton
-                android:id="@+id/btn_add_to_playlist"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
-                android:layout_marginStart="24dp"
-                android:backgroundTint="#00FFFFFF"
-                android:contentDescription="@string/add_to_playlist_description"
-                android:src="@drawable/plus"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <!-- Название трека -->
+                <TextView
+                    android:id="@+id/track_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/album_cover"
+                    app:layout_constraintEnd_toEndOf="@id/album_cover"
+                    app:layout_constraintTop_toBottomOf="@id/album_cover"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textAlignment="viewStart"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="22sp"
+                    tools:text="Название трека" />
 
-            <!-- Центральная кнопка -->
-            <ImageButton
-                android:id="@+id/btn_play_pause"
-                android:layout_width="100dp"
+                <!-- Имя исполнителя -->
+                <TextView
+                    android:id="@+id/artist_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/album_cover"
+                    app:layout_constraintEnd_toEndOf="@id/album_cover"
+                    app:layout_constraintTop_toBottomOf="@id/track_name"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textAlignment="viewStart"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp"
+                    tools:text="Исполнитель" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Кнопки управления -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:background="?attr/colorOnPrimary"
-                android:contentDescription="@string/play_pause_description"
-                android:src="@drawable/play"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginTop="30dp">
 
-            <!-- Правая кнопка -->
-            <ImageButton
-                android:id="@+id/btn_add_to_favorites"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
-                android:layout_marginEnd="24dp"
-                android:backgroundTint="#00FFFFFF"
-                android:contentDescription="@string/add_to_favorites_description"
-                android:src="@drawable/izbran"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <!-- Левая кнопка (добавить в плейлист) -->
+                <ImageButton
+                    android:id="@+id/btn_add_to_playlist"
+                    android:layout_width="51dp"
+                    android:layout_height="51dp"
+                    android:layout_marginStart="24dp"
+                    android:backgroundTint="#00FFFFFF"
+                    android:contentDescription="@string/add_to_playlist_description"
+                    android:src="@drawable/plus"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <!-- Центральная кнопка (play/pause) -->
+                <ImageButton
+                    android:id="@+id/btn_play_pause"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="?attr/colorOnPrimary"
+                    android:contentDescription="@string/play_pause_description"
+                    android:src="@drawable/play"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Прогресс воспроизведения -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:paddingHorizontal="16dp">
+                <!-- Правая кнопка (избранное) -->
+                <ImageButton
+                    android:id="@+id/btn_add_to_favorites"
+                    android:layout_width="51dp"
+                    android:layout_height="51dp"
+                    android:layout_marginEnd="24dp"
+                    android:backgroundTint="#00FFFFFF"
+                    android:contentDescription="@string/add_to_favorites_description"
+                    android:src="@drawable/izbran"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Текущее время -->
-            <TextView
-                android:id="@+id/currentTime"
-                android:layout_width="wrap_content"
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Прогресс воспроизведения -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="12sp"
-                android:textColor="?android:attr/textColorPrimary"
-                android:fontFamily="@font/ys_display_regular"/>
-
-
-
-        </LinearLayout>
-
-        <!-- Таймер  -->
-        <TextView
-            android:id="@+id/timer_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/ys_display_medium"
-            android:textAlignment="center"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
-            android:visibility="gone"
-            tools:text="--:--" />
-
-        <!-- Информация о треке -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="24dp">
-
-            <!-- Длительность -->
-            <LinearLayout
-                android:id="@+id/duration_container"
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp">
 
                 <TextView
-                    android:layout_width="124dp"
+                    android:id="@+id/currentTime"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/duration"
-                    android:textColor="?attr/colorSurfaceVariant"
-                    android:textSize="13sp"
+                    android:text="00:00"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:fontFamily="@font/ys_display_regular"/>
-
-                <TextView
-                    android:id="@+id/duration_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:lines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular"
-                    tools:text="3:45" />
-
             </LinearLayout>
 
-            <!-- Альбом -->
+            <!-- Информация о треке -->
             <LinearLayout
-                android:id="@+id/album_container"
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="24dp">
 
-                <TextView
-                    android:layout_width="124dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/album"
-                    android:textColor="?attr/colorSurfaceVariant"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular" />
+                <!-- Длительность -->
+                <LinearLayout
+                    android:id="@+id/duration_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/album_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:lines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular"
-                    tools:text="Название альбома" />
+                    <TextView
+                        android:layout_width="124dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duration"
+                        android:textColor="?attr/colorSurfaceVariant"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"/>
 
+                    <TextView
+                        android:id="@+id/duration_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:lines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"
+                        tools:text="3:45" />
+                </LinearLayout>
+
+                <!-- Альбом -->
+                <LinearLayout
+                    android:id="@+id/album_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="124dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/album"
+                        android:textColor="?attr/colorSurfaceVariant"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular" />
+
+                    <TextView
+                        android:id="@+id/album_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:lines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"
+                        tools:text="Название альбома" />
+                </LinearLayout>
+
+                <!-- Год -->
+                <LinearLayout
+                    android:id="@+id/year_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="124dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/year"
+                        android:textColor="?attr/colorSurfaceVariant"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular" />
+
+                    <TextView
+                        android:id="@+id/year_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:lines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"
+                        tools:text="2023" />
+                </LinearLayout>
+
+                <!-- Жанр -->
+                <LinearLayout
+                    android:id="@+id/genre_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="124dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/genre"
+                        android:textColor="?attr/colorSurfaceVariant"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular" />
+
+                    <TextView
+                        android:id="@+id/genre_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:lines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"
+                        tools:text="Pop" />
+                </LinearLayout>
+
+                <!-- Страна -->
+                <LinearLayout
+                    android:id="@+id/country_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="124dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/country"
+                        android:textColor="?attr/colorSurfaceVariant"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular" />
+
+                    <TextView
+                        android:id="@+id/country_value"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:lines="1"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/ys_display_regular"
+                        tools:text="USA" />
+                </LinearLayout>
             </LinearLayout>
-
-            <!-- Год -->
-            <LinearLayout
-                android:id="@+id/year_container"
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="124dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/year"
-                    android:textColor="?attr/colorSurfaceVariant"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular" />
-
-                <TextView
-                    android:id="@+id/year_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:lines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular"
-                    tools:text="2023" />
-
-            </LinearLayout>
-
-            <!-- Жанр -->
-            <LinearLayout
-                android:id="@+id/genre_container"
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="124dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/genre"
-                    android:textColor="?attr/colorSurfaceVariant"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular" />
-
-                <TextView
-                    android:id="@+id/genre_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:lines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular"
-                    tools:text="Pop" />
-
-            </LinearLayout>
-
-            <!-- Страна -->
-            <LinearLayout
-                android:id="@+id/country_container"
-                android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="124dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/country"
-                    android:textColor="?attr/colorSurfaceVariant"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular" />
-
-                <TextView
-                    android:id="@+id/country_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:lines="1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="@font/ys_display_regular"
-                    tools:text="USA" />
-
-            </LinearLayout>
-
         </LinearLayout>
+    </ScrollView>
+
+    <!-- Overlay для затемнения -->
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone"/>
+
+    <!-- Bottom Sheet с плейлистами -->
+    <LinearLayout
+        android:id="@+id/playlists_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bottom_sheet_bg"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="400dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <View
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bottom_sheet_handle"
+            android:alpha="1" />
+
+        <!-- Заголовок -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Добавить в плейлист"
+            android:textSize="19sp"
+            android:textFontWeight="500"
+            android:textColor="?android:attr/textColorPrimary"
+            android:fontFamily="@font/ys_display_medium"
+            android:gravity="center"
+            android:padding="16dp"/>
+
+        <!-- Кнопка Новый плейлист -->
+        <Button
+            android:id="@+id/btn_new_playlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="Новый плейлист"
+            android:textAllCaps="false"
+            android:background="@drawable/button_rounded_bg"
+            app:backgroundTint="?attr/colorPrimaryContainer"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textSize="14sp"
+            android:textFontWeight="500"
+            android:fontFamily="@font/ys_display_medium"
+            android:paddingVertical="12dp"/>
+
+
+
+
+
+        <!-- RecyclerView для списка плейлистов -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_playlists"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp"/>
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

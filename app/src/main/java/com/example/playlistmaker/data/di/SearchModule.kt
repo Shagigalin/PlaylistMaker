@@ -1,5 +1,6 @@
 package com.example.playlistmaker.data.di
 
+import android.app.Application
 import com.example.playlistmaker.feature_search.data.network.ITunesApi
 import com.example.playlistmaker.feature_search.data.repository.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.feature_search.data.repository.TrackRepositorySimple
@@ -9,15 +10,12 @@ import com.example.playlistmaker.feature_search.domain.usecase.*
 import com.example.playlistmaker.feature_search.presentation.SearchViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import com.example.playlistmaker.feature_search.domain.usecase.SearchTracksUseCaseImpl
-import com.example.playlistmaker.feature_search.domain.usecase.GetSearchHistoryUseCaseImpl
-import com.example.playlistmaker.feature_search.domain.usecase.AddToSearchHistoryUseCaseImpl
-import com.example.playlistmaker.feature_search.domain.usecase.ClearSearchHistoryUseCaseImpl
 
 val searchModule = module {
 
@@ -79,14 +77,14 @@ val searchModule = module {
         ClearSearchHistoryUseCaseImpl(get())
     }
 
-
+    // 4. ViewModel
     viewModel {
         SearchViewModel(
             searchTracksUseCase = get(),
             getSearchHistoryUseCase = get(),
             addToSearchHistoryUseCase = get(),
-            clearSearchHistoryUseCase = get()
-
+            clearSearchHistoryUseCase = get(),
+            application = androidApplication()
         )
     }
 }

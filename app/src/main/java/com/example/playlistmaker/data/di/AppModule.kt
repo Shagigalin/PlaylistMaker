@@ -2,6 +2,10 @@ package com.example.playlistmaker.data.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.playlistmaker.domain.di.useCaseModule
+import com.example.playlistmaker.feature_medialibrary.di.mediaLibraryModule
+import com.example.playlistmaker.feature_playlist.di.playlistModule
+import com.example.playlistmaker.feature_playlist.di.playlistUseCaseModule
 import com.example.playlistmaker.feature_search.data.storage.SharedPreferencesStorage
 import com.example.playlistmaker.feature_settings.data.repository.SettingsRepositoryImpl
 import com.example.playlistmaker.feature_settings.domain.repository.SettingsRepository
@@ -17,11 +21,9 @@ val appModule = module {
 
     single { Gson() }
 
-
     single<SharedPreferences> {
         androidContext().getSharedPreferences("app_settings", Context.MODE_PRIVATE)
     }
-
 
     single<SharedPreferencesStorage> {
         val sharedPreferences = androidContext()
@@ -31,18 +33,28 @@ val appModule = module {
         )
     }
 
-
     single<SettingsRepository> {
         SettingsRepositoryImpl(sharedPreferences = get())
     }
-
 
     factory<GetThemeUseCaseInterface> {
         GetThemeUseCase(settingsRepository = get())
     }
 
-
     factory<SetThemeUseCaseInterface> {
         SetThemeUseCase(settingsRepository = get())
     }
 }
+
+
+val allModules = listOf(
+    appModule,
+    databaseModule,
+    repositoryModule,
+    useCaseModule,
+    playlistModule,
+    searchModule,
+    playerModule,
+    settingsModule,
+    mediaLibraryModule
+)

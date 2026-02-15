@@ -18,6 +18,19 @@
 
     <color name="izbr_w">#401A1B22</color>
     <color name="izbr_b">#40FFFFFF</color>
+    <color name="YP_Gray">#AEAEB4</color>
+    <color name="blue">#3772E7</color>
+
+
+    <color name="black">#1A1B22</color>
+    <color name="yp_blue">#3772E7</color>
+    <color name="yp_text_gray">#AEAFB4</color>
+    <color name="yp_white">#FFFFFF</color>
+
+
+    <color name="yp_black">#1A1B22</color>
+
+
 
 
 </resources>

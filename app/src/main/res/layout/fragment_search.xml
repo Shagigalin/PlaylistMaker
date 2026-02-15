@@ -148,6 +148,7 @@
             android:layout_marginBottom="24dp"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
+
             />
 
         <Button
@@ -190,6 +191,7 @@
             android:textSize="19sp"
             android:textColor="?attr/android:textColorPrimary"
             android:gravity="center"
+
             />
 
     </LinearLayout>

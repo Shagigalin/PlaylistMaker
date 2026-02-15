@@ -1,7 +1,9 @@
 package com.example.playlistmaker.data.di
 
 import com.example.playlistmaker.data.repository.FavoriteTracksRepositoryImpl
+import com.example.playlistmaker.data.repository.PlaylistRepositoryImpl
 import com.example.playlistmaker.domain.repository.FavoriteTracksRepository
+import com.example.playlistmaker.feature_playlist.domain.repository.PlaylistRepository
 import com.example.playlistmaker.feature_search.data.repository.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.feature_search.data.repository.TrackRepositorySimple
 import com.example.playlistmaker.feature_search.domain.repository.SearchHistoryRepository
@@ -9,6 +11,7 @@ import com.example.playlistmaker.feature_search.domain.repository.TrackRepositor
 import org.koin.dsl.module
 
 val repositoryModule = module {
+
     single<TrackRepository> {
         TrackRepositorySimple(
             iTunesApi = get(),
@@ -27,6 +30,15 @@ val repositoryModule = module {
     single<FavoriteTracksRepository> {
         FavoriteTracksRepositoryImpl(
             favoriteTracksDao = get()
+        )
+    }
+
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(
+            playlistDao = get(),
+            playlistTrackDao = get(),
+            gson = get()
         )
     }
 }
