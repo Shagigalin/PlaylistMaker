@@ -4,6 +4,7 @@ import com.example.playlistmaker.data.db.PlaylistDao
 import com.example.playlistmaker.data.db.PlaylistEntity
 import com.example.playlistmaker.data.db.PlaylistTrackDao
 import com.example.playlistmaker.data.db.PlaylistTrackEntity
+import com.example.playlistmaker.feature_player.presentation.AddToPlaylistResult
 import com.example.playlistmaker.feature_playlist.domain.model.Playlist
 import com.example.playlistmaker.feature_playlist.domain.repository.PlaylistRepository
 import com.example.playlistmaker.feature_search.domain.model.Track
@@ -53,7 +54,7 @@ class PlaylistRepositoryImpl(
 
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track): Result<Unit> {
         return try {
-            // 1. Сохраняем трек в таблицу playlist_tracks
+
             val trackEntity = PlaylistTrackEntity(
                 trackId = track.trackId,
                 trackName = track.trackName,
@@ -68,7 +69,7 @@ class PlaylistRepositoryImpl(
             )
             playlistTrackDao.insertTrack(trackEntity)
 
-            // 2. Обновляем список треков в плейлисте
+
             val updatedTrackIds = playlist.trackIds.toMutableList().apply {
                 add(track.trackId)
             }

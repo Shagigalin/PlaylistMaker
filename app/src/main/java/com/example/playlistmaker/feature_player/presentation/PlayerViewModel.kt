@@ -125,7 +125,7 @@ class PlayerViewModel(
 
     fun showBottomSheet() {
         _state.value = _state.value?.copy(isBottomSheetVisible = true)
-        // Обновляем список плейлистов
+
         loadPlaylists()
     }
 
@@ -137,7 +137,6 @@ class PlayerViewModel(
         val currentTrack = _state.value?.track ?: return
 
         viewModelScope.launch {
-
             _state.value = _state.value?.copy(isLoading = true)
 
             try {
@@ -145,14 +144,20 @@ class PlayerViewModel(
                 val isInPlaylist = playlistUseCase.isTrackInPlaylist(playlist, currentTrack.trackId)
 
                 if (isInPlaylist) {
+
                     _state.value = _state.value?.copy(
                         addToPlaylistResult = AddToPlaylistResult.AlreadyExists(playlist.name),
                         isLoading = false
                     )
+
                 } else {
+
                     val result = playlistUseCase.addTrackToPlaylist(playlist, currentTrack)
                     result.fold(
                         onSuccess = {
+
+                            loadPlaylists()
+
                             _state.value = _state.value?.copy(
                                 addToPlaylistResult = AddToPlaylistResult.Success(playlist.name),
                                 isBottomSheetVisible = false,
