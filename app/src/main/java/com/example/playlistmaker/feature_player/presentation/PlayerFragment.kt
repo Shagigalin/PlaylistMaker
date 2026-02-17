@@ -148,25 +148,32 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             updateUI(state)
 
-            // Управление Bottom Sheet
+
             if (state.isBottomSheetVisible) {
                 if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
+
                 playlistAdapter.submitList(state.playlists)
+            } else {
+                if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
             }
 
-            // Показываем результат добавления в плейлист
+
             state.addToPlaylistResult?.let { result ->
                 when (result) {
                     is AddToPlaylistResult.Success -> {
-                        CustomToast.show(requireContext(), "Добавлено в плейлист ${result.playlistName}")
+                        showToast("Добавлено в плейлист ${result.playlistName}")
+
                     }
                     is AddToPlaylistResult.AlreadyExists -> {
-                        CustomToast.show(requireContext(), "Трек уже добавлен в плейлист ${result.playlistName}")
+                        showToast("Трек уже добавлен в плейлист ${result.playlistName}")
+
                     }
                     is AddToPlaylistResult.Error -> {
-                        CustomToast.show(requireContext(), "Ошибка: ${result.message}")
+                        showToast("Ошибка: ${result.message}")
                     }
                 }
                 viewModel.onAddToPlaylistResultShown()

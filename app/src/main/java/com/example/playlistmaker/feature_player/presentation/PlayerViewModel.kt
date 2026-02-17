@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.usecase.FavoriteTracksUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.PlayerControlsUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseCase
@@ -137,45 +136,52 @@ class PlayerViewModel(
         val currentTrack = _state.value?.track ?: return
 
         viewModelScope.launch {
-            _state.value = _state.value?.copy(isLoading = true)
-
             try {
 
-                val isInPlaylist = playlistUseCase.isTrackInPlaylist(playlist, currentTrack.trackId)
+                val updatedPlaylist = playlistUseCase.getPlaylistById(playlist.id)
+
+                if (updatedPlaylist == null) {
+                    _state.value = _state.value?.copy(
+                        addToPlaylistResult = AddToPlaylistResult.Error("Плейлист не найден")
+                    )
+                    return@launch
+                }
+
+
+                val isInPlaylist = updatedPlaylist.trackIds.contains(currentTrack.trackId)
 
                 if (isInPlaylist) {
 
                     _state.value = _state.value?.copy(
-                        addToPlaylistResult = AddToPlaylistResult.AlreadyExists(playlist.name),
-                        isLoading = false
+                        addToPlaylistResult = AddToPlaylistResult.AlreadyExists(updatedPlaylist.name),
+                        isBottomSheetVisible = true
                     )
-
                 } else {
 
-                    val result = playlistUseCase.addTrackToPlaylist(playlist, currentTrack)
+                    val result = playlistUseCase.addTrackToPlaylist(updatedPlaylist, currentTrack)
+
                     result.fold(
                         onSuccess = {
 
                             loadPlaylists()
 
                             _state.value = _state.value?.copy(
-                                addToPlaylistResult = AddToPlaylistResult.Success(playlist.name),
-                                isBottomSheetVisible = false,
-                                isLoading = false
+                                addToPlaylistResult = AddToPlaylistResult.Success(updatedPlaylist.name),
+                                isBottomSheetVisible = false
                             )
                         },
                         onFailure = { error ->
                             _state.value = _state.value?.copy(
-                                addToPlaylistResult = AddToPlaylistResult.Error(error.message ?: "Unknown error"),
-                                isLoading = false
+                                addToPlaylistResult = AddToPlaylistResult.Error(error.message ?: "Ошибка добавления"),
+                                isBottomSheetVisible = true
                             )
                         }
                     )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value?.copy(
-                    addToPlaylistResult = AddToPlaylistResult.Error(e.message ?: "Unknown error"),
-                    isLoading = false
+                    addToPlaylistResult = AddToPlaylistResult.Error(e.message ?: "Ошибка"),
+                    isBottomSheetVisible = true
                 )
             }
         }

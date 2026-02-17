@@ -8,6 +8,7 @@ data class PlayerUiState(
     val isPlaying: Boolean = false,
     val currentTime: String = "00:00",
     val isLoading: Boolean = false,
+    val isLoadingPlaylists: Boolean = false,
     val isPrepared: Boolean = false,
     val error: String? = null,
     val playlists: List<Playlist> = emptyList(),

@@ -16,7 +16,19 @@ class PlaylistViewModel(
     val state: LiveData<PlaylistState> = _state
 
     init {
-        loadPlaylists()
+        observePlaylists()
+    }
+
+    private fun observePlaylists() {
+        viewModelScope.launch {
+            playlistUseCase.getAllPlaylists().collect { playlists ->
+
+                _state.value = when {
+                    playlists.isEmpty() -> PlaylistState.Empty
+                    else -> PlaylistState.Content(playlists)
+                }
+            }
+        }
     }
 
     fun loadPlaylists() {
@@ -35,9 +47,7 @@ class PlaylistViewModel(
         }
     }
 
-    fun refreshPlaylists() {
-        loadPlaylists()
-    }
+
 }
 
 sealed class PlaylistState {

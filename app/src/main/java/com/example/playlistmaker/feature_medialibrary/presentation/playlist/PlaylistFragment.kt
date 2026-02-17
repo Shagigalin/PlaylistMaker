@@ -43,10 +43,7 @@ class PlaylistFragment : Fragment() {
         observeViewModel()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshPlaylists()
-    }
+
 
     private fun setupViews() {
         binding.buttonCreatePlaylist.setOnClickListener {

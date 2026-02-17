@@ -12,6 +12,8 @@ interface PlaylistUseCase {
         coverPath: String?
     ): Long
 
+    suspend fun getPlaylistById(id: Long): Playlist?
+
     fun getAllPlaylists(): Flow<List<Playlist>>
 
     suspend fun addTrackToPlaylist(playlist: Playlist, track: Track): Result<Unit>
@@ -22,6 +24,9 @@ interface PlaylistUseCase {
 class PlaylistUseCaseImpl(
     private val repository: PlaylistRepository
 ) : PlaylistUseCase {
+
+    override suspend fun getPlaylistById(id: Long): Playlist? =
+        repository.getPlaylistById(id)
 
     override suspend fun createPlaylist(
         name: String,

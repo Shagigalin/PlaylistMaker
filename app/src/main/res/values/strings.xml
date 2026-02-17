@@ -140,5 +140,13 @@
     <string name="tracks_count_few">%d трека</string>
     <string name="tracks_count_many">%d треков</string>
 
+    <plurals name="tracks_count">
+        <item quantity="zero">%d треков</item>
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
+
 
 </resources>

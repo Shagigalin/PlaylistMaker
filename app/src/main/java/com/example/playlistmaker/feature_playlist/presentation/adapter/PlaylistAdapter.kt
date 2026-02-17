@@ -25,6 +25,10 @@ class PlaylistAdapter(
         return PlaylistViewHolder(binding, onItemClick)
     }
 
+    fun updatePlaylists(playlists: List<Playlist>) {
+        submitList(playlists)
+    }
+
     override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -70,12 +74,11 @@ class PlaylistAdapter(
         }
 
         private fun getTrackCountText(count: Int): String {
-            return when {
-                count % 100 in 11..19 -> "$count треков"
-                count % 10 == 1 -> "$count трек"
-                count % 10 in 2..4 -> "$count трека"
-                else -> "$count треков"
-            }
+            return itemView.context.resources.getQuantityString(
+                R.plurals.tracks_count,
+                count,
+                count
+            )
         }
     }
 
@@ -88,4 +91,6 @@ class PlaylistAdapter(
             return oldItem == newItem
         }
     }
+
+
 }

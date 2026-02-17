@@ -55,6 +55,11 @@ class PlaylistRepositoryImpl(
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track): Result<Unit> {
         return try {
 
+            if (playlist.trackIds.contains(track.trackId)) {
+                return Result.failure(Exception("Трек уже в плейлисте"))
+            }
+
+
             val trackEntity = PlaylistTrackEntity(
                 trackId = track.trackId,
                 trackName = track.trackName,
@@ -70,10 +75,19 @@ class PlaylistRepositoryImpl(
             playlistTrackDao.insertTrack(trackEntity)
 
 
-            val updatedTrackIds = playlist.trackIds.toMutableList().apply {
-                add(track.trackId)
+            val currentPlaylistEntity = playlistDao.getPlaylistById(playlist.id)
+                ?: return Result.failure(Exception("Плейлист не найден"))
+
+
+            val currentTrackIds = gson.fromJson(currentPlaylistEntity.trackIdsJson, Array<Long>::class.java)
+                .toMutableList()
+
+            if (!currentTrackIds.contains(track.trackId)) {
+                currentTrackIds.add(track.trackId)
             }
-            val updatedTrackIdsJson = gson.toJson(updatedTrackIds)
+
+            val updatedTrackIdsJson = gson.toJson(currentTrackIds)
+
 
             val updatedPlaylistEntity = PlaylistEntity(
                 playlistId = playlist.id,
@@ -81,7 +95,7 @@ class PlaylistRepositoryImpl(
                 description = playlist.description,
                 coverPath = playlist.coverPath,
                 trackIdsJson = updatedTrackIdsJson,
-                trackCount = playlist.trackCount + 1
+                trackCount = currentTrackIds.size
             )
             playlistDao.updatePlaylist(updatedPlaylistEntity)
 
@@ -89,6 +103,22 @@ class PlaylistRepositoryImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun getPlaylistById(id: Long): Playlist? {
+        val entity = playlistDao.getPlaylistById(id) ?: return null
+        return Playlist(
+            id = entity.playlistId,
+            name = entity.name,
+            description = entity.description,
+            coverPath = entity.coverPath,
+            trackIds = try {
+                gson.fromJson(entity.trackIdsJson, Array<Long>::class.java).toList()
+            } catch (e: Exception) {
+                emptyList()
+            },
+            trackCount = entity.trackCount
+        )
     }
 
     override suspend fun isTrackInPlaylist(playlist: Playlist, trackId: Long): Boolean {
