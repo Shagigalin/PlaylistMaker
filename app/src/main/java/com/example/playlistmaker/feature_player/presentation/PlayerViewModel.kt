@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.usecase.FavoriteTracksUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.PlayerControlsUseCase
 import com.example.playlistmaker.feature_player.domain.usecase.TimeFormatterUseCase
+import com.example.playlistmaker.feature_playlist.domain.model.Playlist
+import com.example.playlistmaker.feature_playlist.domain.usecase.PlaylistUseCase
 import com.example.playlistmaker.feature_search.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -17,23 +18,21 @@ class PlayerViewModel(
     private val track: Track?,
     private val playerControlsUseCase: PlayerControlsUseCase,
     private val timeFormatterUseCase: TimeFormatterUseCase,
-    private val favoriteTracksUseCase: FavoriteTracksUseCase
+    private val favoriteTracksUseCase: FavoriteTracksUseCase,
+    private val playlistUseCase: PlaylistUseCase
 ) : ViewModel() {
 
     companion object {
         private const val UPDATE_INTERVAL_MS = 300L
     }
 
-    private val _state = MutableLiveData<PlayerUiState>()
+    private val _state = MutableLiveData(PlayerUiState(track = track))
     val state: LiveData<PlayerUiState> = _state
 
     private var progressUpdateJob: Job? = null
 
     init {
-        _state.value = PlayerUiState(
-            track = track,
-            isPrepared = track?.previewUrl == null
-        )
+        loadPlaylists()
 
         track?.previewUrl?.let { previewUrl ->
             _state.value = _state.value?.copy(isLoading = true)
@@ -41,6 +40,14 @@ class PlayerViewModel(
         }
 
         observePlayerState()
+    }
+
+    private fun loadPlaylists() {
+        viewModelScope.launch {
+            playlistUseCase.getAllPlaylists().collect { playlists ->
+                _state.value = _state.value?.copy(playlists = playlists)
+            }
+        }
     }
 
     private fun observePlayerState() {
@@ -77,38 +84,111 @@ class PlayerViewModel(
         }
     }
 
-
     fun toggleFavorite() {
         val currentTrack = _state.value?.track ?: return
         viewModelScope.launch {
             if (currentTrack.isFavorite) {
-                try {
-                    favoriteTracksUseCase.removeFromFavorites(currentTrack)
-                    _state.value = _state.value?.copy(
-                        track = currentTrack.copy(isFavorite = false)
-                    )
-                } catch (e: Exception) {
-                    _state.value = _state.value?.copy(
-                        error = requireContext().getString(R.string.error_removing_from_favorites)
-                    )
-                }
+                favoriteTracksUseCase.removeFromFavorites(currentTrack)
+                _state.value = _state.value?.copy(
+                    track = currentTrack.copy(isFavorite = false)
+                )
             } else {
-                try {
-                    favoriteTracksUseCase.addToFavorites(currentTrack)
-                    _state.value = _state.value?.copy(
-                        track = currentTrack.copy(isFavorite = true)
-                    )
-                } catch (e: Exception) {
-                    _state.value = _state.value?.copy(
-                        error = requireContext().getString(R.string.error_adding_to_favorites)
-                    )
-                }
+                favoriteTracksUseCase.addToFavorites(currentTrack)
+                _state.value = _state.value?.copy(
+                    track = currentTrack.copy(isFavorite = true)
+                )
             }
         }
     }
 
-    private fun requireContext(): android.content.Context {
-        return android.app.Application().applicationContext
+    fun togglePlayback() {
+        val currentState = _state.value ?: return
+        if (currentState.track == null) return
+
+        if (currentState.isPlaying) {
+            pause()
+        } else {
+            play()
+        }
+    }
+
+    fun play() {
+        val currentState = _state.value ?: return
+        if (currentState.track == null || !currentState.isPrepared) return
+        playerControlsUseCase.play()
+    }
+
+    fun pause() {
+        playerControlsUseCase.pause()
+    }
+
+    fun showBottomSheet() {
+        _state.value = _state.value?.copy(isBottomSheetVisible = true)
+
+        loadPlaylists()
+    }
+
+    fun hideBottomSheet() {
+        _state.value = _state.value?.copy(isBottomSheetVisible = false)
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val currentTrack = _state.value?.track ?: return
+
+        viewModelScope.launch {
+            try {
+
+                val updatedPlaylist = playlistUseCase.getPlaylistById(playlist.id)
+
+                if (updatedPlaylist == null) {
+                    _state.value = _state.value?.copy(
+                        addToPlaylistResult = AddToPlaylistResult.Error("Плейлист не найден")
+                    )
+                    return@launch
+                }
+
+
+                val isInPlaylist = updatedPlaylist.trackIds.contains(currentTrack.trackId)
+
+                if (isInPlaylist) {
+
+                    _state.value = _state.value?.copy(
+                        addToPlaylistResult = AddToPlaylistResult.AlreadyExists(updatedPlaylist.name),
+                        isBottomSheetVisible = true
+                    )
+                } else {
+
+                    val result = playlistUseCase.addTrackToPlaylist(updatedPlaylist, currentTrack)
+
+                    result.fold(
+                        onSuccess = {
+
+                            loadPlaylists()
+
+                            _state.value = _state.value?.copy(
+                                addToPlaylistResult = AddToPlaylistResult.Success(updatedPlaylist.name),
+                                isBottomSheetVisible = false
+                            )
+                        },
+                        onFailure = { error ->
+                            _state.value = _state.value?.copy(
+                                addToPlaylistResult = AddToPlaylistResult.Error(error.message ?: "Ошибка добавления"),
+                                isBottomSheetVisible = true
+                            )
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value?.copy(
+                    addToPlaylistResult = AddToPlaylistResult.Error(e.message ?: "Ошибка"),
+                    isBottomSheetVisible = true
+                )
+            }
+        }
+    }
+
+    fun onAddToPlaylistResultShown() {
+        _state.value = _state.value?.copy(addToPlaylistResult = null)
     }
 
     private fun startProgressUpdates() {
@@ -134,27 +214,6 @@ class PlayerViewModel(
         val currentTime = timeFormatterUseCase.formatTime(currentPosition)
 
         _state.value = currentState.copy(currentTime = currentTime)
-    }
-
-    fun togglePlayback() {
-        val currentState = _state.value ?: return
-        if (currentState.track == null) return
-
-        if (currentState.isPlaying) {
-            pause()
-        } else {
-            play()
-        }
-    }
-
-    fun play() {
-        val currentState = _state.value ?: return
-        if (currentState.track == null || !currentState.isPrepared) return
-        playerControlsUseCase.play()
-    }
-
-    fun pause() {
-        playerControlsUseCase.pause()
     }
 
     fun seekTo(progress: Float) {

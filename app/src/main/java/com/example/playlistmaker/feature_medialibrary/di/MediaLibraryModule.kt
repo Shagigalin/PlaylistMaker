@@ -7,8 +7,14 @@ import org.koin.dsl.module
 
 val mediaLibraryModule = module {
 
-    // ViewModels
-    viewModel { PlaylistViewModel() }
+
+    viewModel {
+        PlaylistViewModel(
+            playlistUseCase = get()
+        )
+    }
+
+
     viewModel {
         FavoritesViewModel(
             favoriteTracksUseCase = get()

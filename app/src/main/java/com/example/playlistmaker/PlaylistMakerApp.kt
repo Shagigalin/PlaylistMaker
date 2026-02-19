@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.data.di.*
 import com.example.playlistmaker.domain.di.useCaseModule
 import com.example.playlistmaker.feature_medialibrary.di.mediaLibraryModule
+import com.example.playlistmaker.feature_playlist.di.playlistModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -31,6 +32,7 @@ class PlaylistMakerApp : Application() {
                 databaseModule,
                 repositoryModule,
                 useCaseModule,
+                playlistModule,
                 searchModule,
                 playerModule,
                 mediaLibraryModule,
