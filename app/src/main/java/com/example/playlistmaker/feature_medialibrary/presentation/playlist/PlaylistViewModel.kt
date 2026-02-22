@@ -19,6 +19,10 @@ class PlaylistViewModel(
         observePlaylists()
     }
 
+    fun refreshPlaylists() {
+        loadPlaylists()
+    }
+
     private fun observePlaylists() {
         viewModelScope.launch {
             playlistUseCase.getAllPlaylists().collect { playlists ->

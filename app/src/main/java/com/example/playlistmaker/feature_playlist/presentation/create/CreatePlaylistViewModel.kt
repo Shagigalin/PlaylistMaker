@@ -1,55 +1,56 @@
 package com.example.playlistmaker.feature_playlist.presentation.create
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.net.Uri
+import com.example.playlistmaker.feature_playlist.domain.model.Playlist
 import com.example.playlistmaker.feature_playlist.domain.usecase.PlaylistUseCase
 import com.example.playlistmaker.feature_playlist.presentation.model.CreatePlaylistState
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
-    private val playlistUseCase: PlaylistUseCase
+open class CreatePlaylistViewModel(
+    // Изменяем с private на protected
+    protected val playlistUseCase: PlaylistUseCase
 ) : ViewModel() {
 
-    private val _state = MutableLiveData(CreatePlaylistState())
+    protected val _state = MutableLiveData(CreatePlaylistState())
     val state: LiveData<CreatePlaylistState> = _state
 
-    private val _navigateBack = MutableLiveData<Boolean>()
+    protected val _navigateBack = MutableLiveData(false)
     val navigateBack: LiveData<Boolean> = _navigateBack
 
-    private val _showSuccessMessage = MutableLiveData<String?>()
+    protected val _showSuccessMessage = MutableLiveData<String?>(null)
     val showSuccessMessage: LiveData<String?> = _showSuccessMessage
 
-    private val _showExitDialog = MutableLiveData<Boolean>()
+    protected val _showExitDialog = MutableLiveData(false)
     val showExitDialog: LiveData<Boolean> = _showExitDialog
 
-    private var hasUnsavedChanges = false
+    protected var hasUnsavedChanges = false
 
-    fun updateName(name: String) {
-        val isValid = name.isNotBlank()
-        _state.value = _state.value?.copy(
+    open fun updateName(name: String) {
+        val currentState = _state.value ?: return
+        _state.value = currentState.copy(
             name = name,
-            isNameValid = isValid
+            isNameValid = name.isNotBlank()
         )
-        hasUnsavedChanges = hasUnsavedChanges || name.isNotBlank()
+        hasUnsavedChanges = true
     }
 
-    fun updateDescription(description: String) {
-        _state.value = _state.value?.copy(description = description)
-        hasUnsavedChanges = hasUnsavedChanges || description.isNotBlank()
+    open fun updateDescription(description: String) {
+        val currentState = _state.value ?: return
+        _state.value = currentState.copy(description = description)
+        hasUnsavedChanges = true
     }
 
-    fun updateCover(uri: Uri?, path: String?) {
-        _state.value = _state.value?.copy(
-            coverUri = uri,
-            coverPath = path
-        )
-        hasUnsavedChanges = hasUnsavedChanges || uri != null
+    open fun updateCover(uri: Uri, path: String) {
+        val currentState = _state.value ?: return
+        _state.value = currentState.copy(coverUri = uri, coverPath = path)
+        hasUnsavedChanges = true
     }
 
-    fun createPlaylist() {
+    open fun createPlaylist() {
         val currentState = _state.value ?: return
         if (!currentState.isNameValid) return
 
@@ -63,16 +64,9 @@ class CreatePlaylistViewModel(
                     coverPath = currentState.coverPath
                 )
 
-                if (playlistId > 0) {
-                    _showSuccessMessage.value = currentState.name
-                    _navigateBack.value = true
-                    hasUnsavedChanges = false
-                } else {
-                    _state.value = currentState.copy(
-                        error = "Ошибка при создании плейлиста",
-                        isSaving = false
-                    )
-                }
+                _showSuccessMessage.value = currentState.name
+                _navigateBack.value = true
+                hasUnsavedChanges = false
             } catch (e: Exception) {
                 _state.value = currentState.copy(
                     error = e.message ?: "Ошибка при создании плейлиста",
@@ -82,7 +76,7 @@ class CreatePlaylistViewModel(
         }
     }
 
-    fun onBackPressed() {
+    open fun onBackPressed() {
         if (hasUnsavedChanges) {
             _showExitDialog.value = true
         } else {
@@ -99,11 +93,11 @@ class CreatePlaylistViewModel(
         _showExitDialog.value = false
     }
 
-    fun onSuccessMessageShown() {
-        _showSuccessMessage.value = null
-    }
-
     fun onNavigateBackHandled() {
         _navigateBack.value = false
+    }
+
+    fun onSuccessMessageShown() {
+        _showSuccessMessage.value = null
     }
 }

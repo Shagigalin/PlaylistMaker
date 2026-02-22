@@ -20,20 +20,20 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.example.playlistmaker.feature_playlist.presentation.model.CreatePlaylistState
-import com.example.playlistmaker.utils.CustomToast
 import com.example.playlistmaker.utils.ImageUtils
-import com.example.playlistmaker.utils.StoragePermissionHelper
+import com.example.playlistmaker.utils.PermissionChecker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+    protected var _binding: FragmentCreatePlaylistBinding? = null
+    protected val binding get() = _binding!!
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
 
-    private lateinit var permissionHelper: StoragePermissionHelper
+    protected open val viewModel: CreatePlaylistViewModel by viewModel()
+
+    private lateinit var permissionChecker: PermissionChecker
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -57,20 +57,19 @@ class CreatePlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        permissionHelper = StoragePermissionHelper(this)
-
+        permissionChecker = PermissionChecker(this)
         setupViews()
         setupObservers()
         handleBackPress()
     }
 
-    private fun setupViews() {
+    protected open fun setupViews() {
         binding.toolbar.setNavigationOnClickListener {
             viewModel.onBackPressed()
         }
 
         binding.coverContainer.setOnClickListener {
-            permissionHelper.checkStoragePermission {
+            permissionChecker.checkStoragePermission {
                 openImagePicker()
             }
         }
@@ -88,7 +87,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
+    protected open fun setupObservers() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             updateUI(state)
         }
@@ -102,8 +101,11 @@ class CreatePlaylistFragment : Fragment() {
 
         viewModel.showSuccessMessage.observe(viewLifecycleOwner) { playlistName ->
             playlistName?.let {
-
-                CustomToast.show(requireContext(), getString(R.string.playlist_created, it))
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.playlist_created, it),
+                    Toast.LENGTH_SHORT
+                ).show()
                 viewModel.onSuccessMessageShown()
             }
         }
@@ -116,11 +118,11 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun updateUI(state: CreatePlaylistState) {
+    protected open fun updateUI(state: CreatePlaylistState) {
         binding.btnCreate.isEnabled = state.isNameValid && !state.isSaving
 
         if (state.isSaving) {
-            binding.btnCreate.text = "Сохранение..."
+            binding.btnCreate.text = getString(R.string.saving)
         } else {
             binding.btnCreate.text = getString(R.string.create)
         }
@@ -163,7 +165,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun showSelectedImage(uri: Uri) {
+    protected fun showSelectedImage(uri: Uri) {
         binding.coverPlaceholder.visibility = View.GONE
         binding.ivCover.visibility = View.VISIBLE
 
