@@ -366,7 +366,7 @@
         <!-- Кнопка Новый плейлист -->
         <Button
             android:id="@+id/btn_new_playlist"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Новый плейлист"
@@ -377,7 +377,8 @@
             android:textSize="14sp"
             android:textFontWeight="500"
             android:fontFamily="@font/ys_display_medium"
-            android:paddingVertical="12dp"/>
+
+            android:layout_gravity="center_horizontal"/>
 
 
 

@@ -16,13 +16,15 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
+import com.example.playlistmaker.core.NavigationController
 import com.example.playlistmaker.databinding.FragmentPlaylistDetailsBinding
 import com.example.playlistmaker.feature_playlist.domain.model.PlaylistDetails
 import com.example.playlistmaker.feature_playlist.presentation.adapter.PlaylistTracksAdapter
+import com.example.playlistmaker.feature_playlist.presentation.model.TrackDisplay
 import com.example.playlistmaker.feature_search.domain.model.Track
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 
 class PlaylistDetailsFragment : Fragment() {
@@ -31,7 +33,9 @@ class PlaylistDetailsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args: PlaylistDetailsFragmentArgs by navArgs()
-    private val viewModel: PlaylistDetailsViewModel by viewModel()
+    private val viewModel: PlaylistDetailsViewModel by viewModel {
+        parametersOf(args.playlistId)
+    }
 
     private lateinit var tracksBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var menuBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
@@ -49,6 +53,9 @@ class PlaylistDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        (requireActivity() as? NavigationController)?.showBottomNavigation(false)
+
         setupBottomSheets()
         setupViews()
         observeViewModel()
@@ -56,12 +63,21 @@ class PlaylistDetailsFragment : Fragment() {
         viewModel.loadPlaylistDetails(args.playlistId)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        (requireActivity() as? NavigationController)?.showBottomNavigation(true)
+        _binding = null
+    }
+
     private fun setupBottomSheets() {
-        // Bottom Sheet для списка треков
+
         tracksBottomSheetBehavior = BottomSheetBehavior.from(binding.tracksBottomSheet).apply {
             state = BottomSheetBehavior.STATE_COLLAPSED
             isHideable = false
-            peekHeight = 300
+
+
+
         }
 
         tracksBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -70,8 +86,10 @@ class PlaylistDetailsFragment : Fragment() {
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = slideOffset * 0.6f
-                binding.overlay.visibility = View.VISIBLE
+                if (_binding != null) {
+                    binding.overlay.alpha = slideOffset * 0.6f
+                    binding.overlay.visibility = View.VISIBLE
+                }
             }
         })
 
@@ -83,29 +101,38 @@ class PlaylistDetailsFragment : Fragment() {
 
         menuBottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.visibility = View.GONE
-                        viewModel.hideMenu()
-                    }
-                    else -> {
-                        binding.overlay.visibility = View.VISIBLE
+                if (_binding != null) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            binding.overlay.visibility = View.GONE
+                            viewModel.hideMenu()
+                        }
+                        else -> {
+                            binding.overlay.visibility = View.VISIBLE
+                        }
                     }
                 }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = slideOffset * 0.6f
+                if (_binding != null) {
+                    binding.overlay.alpha = slideOffset * 0.6f
+                }
             }
         })
 
-        // Настройка адаптера для треков
+
         tracksAdapter = PlaylistTracksAdapter(
-            onItemClick = { track ->
-                viewModel.onTrackClick(track)
+            onItemClick = { trackDisplay ->
+
+                val details = (viewModel.state.value as? PlaylistDetailsState.Content)?.details
+                val originalTrack = details?.tracks?.find { it.trackId == trackDisplay.trackId }
+                originalTrack?.let { viewModel.onTrackClick(it) }
             },
-            onItemLongClick = { track ->
-                viewModel.onTrackLongClick(track)
+            onItemLongClick = { trackDisplay ->
+                val details = (viewModel.state.value as? PlaylistDetailsState.Content)?.details
+                val originalTrack = details?.tracks?.find { it.trackId == trackDisplay.trackId }
+                originalTrack?.let { viewModel.onTrackLongClick(it) }
             }
         )
 
@@ -114,7 +141,7 @@ class PlaylistDetailsFragment : Fragment() {
             adapter = tracksAdapter
         }
 
-        // Настройка кликов в меню
+
         binding.menuSheet.menuShare.setOnClickListener {
             viewModel.onMenuShareClick()
             menuBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
@@ -155,10 +182,14 @@ class PlaylistDetailsFragment : Fragment() {
             if (shouldNavigate) {
                 val details = (viewModel.state.value as? PlaylistDetailsState.Content)?.details
                 details?.let {
-                    val action = PlaylistDetailsFragmentDirections
-                        .actionPlaylistDetailsFragmentToEditPlaylistFragment(it.playlist)
-                    findNavController().navigate(action)
-                    viewModel.onNavigateToEditHandled()
+                    try {
+                        val action = PlaylistDetailsFragmentDirections
+                            .actionPlaylistDetailsFragmentToEditPlaylistFragment(it.playlist)
+                        findNavController().navigate(action)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(requireContext(), "Ошибка навигации: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -171,10 +202,13 @@ class PlaylistDetailsFragment : Fragment() {
             }
         }
 
+        viewModel.tracksForDisplay.observe(viewLifecycleOwner) { tracks ->
+            tracksAdapter.submitList(tracks)
+        }
+
         viewModel.navigateBack.observe(viewLifecycleOwner) { shouldNavigate ->
             if (shouldNavigate) {
                 findNavController().navigateUp()
-                viewModel.onNavigateBackHandled()
             }
         }
 
@@ -183,28 +217,24 @@ class PlaylistDetailsFragment : Fragment() {
                 val action = PlaylistDetailsFragmentDirections
                     .actionPlaylistDetailsFragmentToPlayerFragment(it)
                 findNavController().navigate(action)
-                viewModel.onNavigateToPlayerHandled()
             }
         }
 
         viewModel.showDeleteTrackDialog.observe(viewLifecycleOwner) { track ->
             track?.let {
                 showDeleteTrackDialog(it)
-                viewModel.onDeleteDialogDismissed()
             }
         }
 
         viewModel.showDeletePlaylistDialog.observe(viewLifecycleOwner) { show ->
             if (show) {
                 showDeletePlaylistDialog()
-                viewModel.onDeleteDialogDismissed()
             }
         }
 
         viewModel.shareText.observe(viewLifecycleOwner) { text ->
             text?.let {
                 sharePlaylist(it)
-                viewModel.onShareHandled()
             }
         }
 
@@ -215,7 +245,6 @@ class PlaylistDetailsFragment : Fragment() {
                     "В этом плейлисте нет списка треков, которым можно поделиться",
                     Toast.LENGTH_LONG
                 ).show()
-                viewModel.onEmptyPlaylistToastHandled()
             }
         }
 
@@ -292,7 +321,6 @@ class PlaylistDetailsFragment : Fragment() {
             .show()
     }
 
-
     private fun isDarkTheme(): Boolean {
         return when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
             Configuration.UI_MODE_NIGHT_YES -> true
@@ -345,16 +373,11 @@ class PlaylistDetailsFragment : Fragment() {
         } else {
             binding.tvEmptyTracks.isVisible = false
             binding.rvTracks.isVisible = true
-            tracksAdapter.submitList(details.tracks)
+
         }
     }
 
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.feature_playlist.domain.model.Playlist
 import com.example.playlistmaker.feature_playlist.domain.usecase.PlaylistUseCase
 import com.example.playlistmaker.feature_playlist.presentation.create.CreatePlaylistViewModel
+import com.example.playlistmaker.feature_playlist.presentation.model.CreatePlaylistState
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -15,15 +16,19 @@ class EditPlaylistViewModel(
 
     init {
 
-        updateName(playlist.name)
-        if (!playlist.description.isNullOrBlank()) {
-            updateDescription(playlist.description)
-        }
+        _state.value = CreatePlaylistState(
+            name = playlist.name,
+            description = playlist.description ?: "",
+            isNameValid = playlist.name.isNotBlank(),
+            coverPath = playlist.coverPath
+        )
+
+
         if (!playlist.coverPath.isNullOrBlank()) {
             val file = File(playlist.coverPath)
             if (file.exists()) {
                 val uri = Uri.fromFile(file)
-                updateCover(uri, playlist.coverPath)
+                _state.value = _state.value?.copy(coverUri = uri)
             }
         }
     }
@@ -45,12 +50,10 @@ class EditPlaylistViewModel(
                     trackCount = playlist.trackCount
                 )
 
-
                 playlistUseCase.updatePlaylist(updatedPlaylist)
 
                 _showSuccessMessage.value = currentState.name
                 _navigateBack.value = true
-                hasUnsavedChanges = false
             } catch (e: Exception) {
                 _state.value = currentState.copy(
                     error = e.message ?: "Ошибка при обновлении плейлиста",

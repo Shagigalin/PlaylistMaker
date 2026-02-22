@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.feature_settings.domain.model.ThemeSettings
 import com.example.playlistmaker.feature_settings.domain.usecase.GetThemeUseCaseInterface
 import com.example.playlistmaker.feature_settings.domain.usecase.SetThemeUseCaseInterface
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
@@ -22,43 +21,32 @@ class SettingsViewModel(
     private val _shouldRecreate = MutableLiveData<Boolean>()
     val shouldRecreate: LiveData<Boolean> = _shouldRecreate
 
-    init {
-        loadSettings()
-
-    }
-
-    private fun loadSettings() = viewModelScope.launch {
-        try {
-            val theme = getThemeUseCase.execute()
-            val isDarkTheme = theme == ThemeSettings.DARK
-            _state.value = SettingsState(isDarkTheme = isDarkTheme)
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            _state.value = SettingsState(error = e.message)
+    fun loadTheme() {
+        viewModelScope.launch {
+            try {
+                val theme = getThemeUseCase.execute()
+                val isDarkTheme = theme == ThemeSettings.DARK
+                _state.value = SettingsState(isDarkTheme = isDarkTheme)
+            } catch (e: Exception) {
+                _state.value = SettingsState(error = e.message)
+            }
         }
     }
 
-    fun toggleTheme() = viewModelScope.launch {
-        val currentState = _state.value ?: SettingsState()
-        val newIsDarkTheme = !currentState.isDarkTheme
-        val newTheme = if (newIsDarkTheme) ThemeSettings.DARK else ThemeSettings.LIGHT
+    fun toggleTheme() {
+        viewModelScope.launch {
+            val currentState = _state.value ?: SettingsState()
+            val newIsDarkTheme = !currentState.isDarkTheme
+            val newTheme = if (newIsDarkTheme) ThemeSettings.DARK else ThemeSettings.LIGHT
 
-        try {
-
-            setThemeUseCase.execute(newTheme)
-
-
-            _state.value = currentState.copy(isDarkTheme = newIsDarkTheme)
-
-
-            applyTheme(newIsDarkTheme)
-
-
-            _shouldRecreate.value = true
-
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            _state.value = currentState.copy(error = e.message)
+            try {
+                setThemeUseCase.execute(newTheme)
+                _state.value = currentState.copy(isDarkTheme = newIsDarkTheme)
+                applyTheme(newIsDarkTheme)
+                _shouldRecreate.value = true
+            } catch (e: Exception) {
+                _state.value = currentState.copy(error = e.message)
+            }
         }
     }
 

@@ -33,10 +33,11 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViews()
         observeViewModel()
+
+        viewModel.loadTheme()
     }
 
     private fun setupViews() {
-
 
         binding.temaButton.setOnClickListener {
             viewModel.toggleTheme()
@@ -77,9 +78,7 @@ class SettingsFragment : Fragment() {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.share_course_text, getString(R.string.android_course_url)))
             }
-
-            val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share_dialog_title))
-            startActivity(chooserIntent)
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dialog_title)))
         } catch (e: ActivityNotFoundException) {
             showToast(R.string.no_apps_found)
         }
@@ -89,7 +88,6 @@ class SettingsFragment : Fragment() {
         try {
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
-
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.support_email)))
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body))

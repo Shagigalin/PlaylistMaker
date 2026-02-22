@@ -175,6 +175,10 @@
 
     <string name="saving">Сохранение...</string>
 
+    <string name="error_navigation">Ошибка навигации: %s</string>
+
+
+
 
 
 

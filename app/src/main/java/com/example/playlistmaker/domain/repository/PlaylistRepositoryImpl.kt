@@ -64,20 +64,24 @@ class PlaylistRepositoryImpl(
         if (trackIds.isEmpty()) return emptyList()
 
         val trackEntities = playlistTrackDao.getTracksByIds(trackIds)
-        return trackEntities.map { entity ->
-            Track(
-                trackId = entity.trackId,
-                trackName = entity.trackName,
-                artistName = entity.artistName,
-                trackTimeMillis = parseTimeToMillis(entity.trackTime),
-                artworkUrl100 = entity.artworkUrl,
-                collectionName = entity.collectionName,
-                releaseDate = entity.releaseDate,
-                primaryGenreName = entity.primaryGenreName,
-                country = entity.country,
-                previewUrl = entity.previewUrl
-            )
-        }
+
+
+        return trackEntities
+            .sortedByDescending { it.addedDate }
+            .map { entity ->
+                Track(
+                    trackId = entity.trackId,
+                    trackName = entity.trackName,
+                    artistName = entity.artistName,
+                    trackTimeMillis = parseTimeToMillis(entity.trackTime),
+                    artworkUrl100 = entity.artworkUrl,
+                    collectionName = entity.collectionName,
+                    releaseDate = entity.releaseDate,
+                    primaryGenreName = entity.primaryGenreName,
+                    country = entity.country,
+                    previewUrl = entity.previewUrl
+                )
+            }
     }
 
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track): Result<Unit> {

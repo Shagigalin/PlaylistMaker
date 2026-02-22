@@ -1,43 +1,51 @@
 package com.example.playlistmaker.feature_playlist.presentation.details
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.feature_playlist.domain.model.Playlist
+import com.example.playlistmaker.R
+import com.example.playlistmaker.core.SingleLiveEvent
 import com.example.playlistmaker.feature_playlist.domain.model.PlaylistDetails
 import com.example.playlistmaker.feature_playlist.domain.usecase.PlaylistUseCase
+import com.example.playlistmaker.feature_playlist.presentation.model.TrackDisplay
 import com.example.playlistmaker.feature_search.domain.model.Track
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlaylistDetailsViewModel(
-    private val playlistUseCase: PlaylistUseCase
-) : ViewModel() {
+    private val playlistUseCase: PlaylistUseCase,
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _state = MutableLiveData<PlaylistDetailsState>()
     val state: LiveData<PlaylistDetailsState> = _state
 
-    private val _navigateBack = MutableLiveData<Boolean>()
+    private val _tracksForDisplay = MutableLiveData<List<TrackDisplay>>()
+    val tracksForDisplay: LiveData<List<TrackDisplay>> = _tracksForDisplay
+
+
+    private val _navigateBack = SingleLiveEvent<Boolean>()
     val navigateBack: LiveData<Boolean> = _navigateBack
 
-    private val _navigateToPlayer = MutableLiveData<Track?>()
+    private val _navigateToPlayer = SingleLiveEvent<Track?>()
     val navigateToPlayer: LiveData<Track?> = _navigateToPlayer
 
-    private val _navigateToEdit = MutableLiveData<Boolean>()
+    private val _navigateToEdit = SingleLiveEvent<Boolean>()
     val navigateToEdit: LiveData<Boolean> = _navigateToEdit
 
-    private val _showDeleteTrackDialog = MutableLiveData<Track?>()
+    private val _showDeleteTrackDialog = SingleLiveEvent<Track?>()
     val showDeleteTrackDialog: LiveData<Track?> = _showDeleteTrackDialog
 
-    private val _showDeletePlaylistDialog = MutableLiveData<Boolean>()
+    private val _showDeletePlaylistDialog = SingleLiveEvent<Boolean>()
     val showDeletePlaylistDialog: LiveData<Boolean> = _showDeletePlaylistDialog
 
-    private val _shareText = MutableLiveData<String?>()
+    private val _shareText = SingleLiveEvent<String?>()
     val shareText: LiveData<String?> = _shareText
 
-    private val _showEmptyPlaylistToast = MutableLiveData<Boolean>()
+    private val _showEmptyPlaylistToast = SingleLiveEvent<Boolean>()
     val showEmptyPlaylistToast: LiveData<Boolean> = _showEmptyPlaylistToast
 
     private val _isMenuVisible = MutableLiveData<Boolean>()
@@ -55,6 +63,13 @@ class PlaylistDetailsViewModel(
                 val details = playlistUseCase.getPlaylistDetails(playlistId)
                 if (details != null) {
                     currentDetails = details
+
+
+                    val tracksForDisplay = details.tracks.map { track ->
+                        TrackDisplay(track)
+                    }
+                    _tracksForDisplay.value = tracksForDisplay
+
                     _state.value = PlaylistDetailsState.Content(details)
                 } else {
                     _state.value = PlaylistDetailsState.Error("Плейлист не найден")
@@ -132,6 +147,7 @@ class PlaylistDetailsViewModel(
 
     private fun buildShareText(details: PlaylistDetails): String {
         val sb = StringBuilder()
+        val context = getApplication<Application>().applicationContext
 
         sb.append(details.playlist.name).append("\n")
 
@@ -139,12 +155,13 @@ class PlaylistDetailsViewModel(
             sb.append(details.playlist.description).append("\n")
         }
 
-        val tracksWord = when (details.tracks.size % 10) {
-            1 -> "трек"
-            2, 3, 4 -> "трека"
-            else -> "треков"
-        }
-        sb.append("${details.tracks.size} $tracksWord").append("\n\n")
+
+        val tracksCountText = context.resources.getQuantityString(
+            R.plurals.tracks_count,
+            details.tracks.size,
+            details.tracks.size
+        )
+        sb.append(tracksCountText).append("\n\n")
 
         details.tracks.forEachIndexed { index, track ->
             val position = index + 1
@@ -156,27 +173,6 @@ class PlaylistDetailsViewModel(
         }
 
         return sb.toString()
-    }
-
-    fun onShareHandled() {
-        _shareText.value = null
-    }
-
-    fun onEmptyPlaylistToastHandled() {
-        _showEmptyPlaylistToast.value = false
-    }
-
-    fun onDeleteDialogDismissed() {
-        _showDeleteTrackDialog.value = null
-        _showDeletePlaylistDialog.value = false
-    }
-
-    fun onNavigateToPlayerHandled() {
-        _navigateToPlayer.value = null
-    }
-
-    fun onNavigateToEditHandled() {
-        _navigateToEdit.value = false
     }
 
     fun formatDuration(millis: Long): String {
@@ -201,14 +197,11 @@ class PlaylistDetailsViewModel(
     fun onBackPressed() {
         _navigateBack.value = true
     }
-
-    fun onNavigateBackHandled() {
-        _navigateBack.value = false
-    }
 }
 
-sealed class PlaylistDetailsState {
-    object Loading : PlaylistDetailsState()
-    data class Content(val details: PlaylistDetails) : PlaylistDetailsState()
-    data class Error(val message: String) : PlaylistDetailsState()
+
+sealed interface PlaylistDetailsState {
+    data object Loading : PlaylistDetailsState
+    data class Content(val details: PlaylistDetails) : PlaylistDetailsState
+    data class Error(val message: String) : PlaylistDetailsState
 }

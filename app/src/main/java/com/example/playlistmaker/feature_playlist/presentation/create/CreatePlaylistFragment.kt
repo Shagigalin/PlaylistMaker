@@ -24,6 +24,7 @@ import com.example.playlistmaker.utils.ImageUtils
 import com.example.playlistmaker.utils.PermissionChecker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 open class CreatePlaylistFragment : Fragment() {
 
@@ -127,8 +128,25 @@ open class CreatePlaylistFragment : Fragment() {
             binding.btnCreate.text = getString(R.string.create)
         }
 
+
+        if (binding.etName.text.toString() != state.name) {
+            binding.etName.setText(state.name)
+        }
+
+        if (binding.etDescription.text.toString() != state.description) {
+            binding.etDescription.setText(state.description)
+        }
+
+
         if (state.coverUri != null) {
             showSelectedImage(state.coverUri)
+        } else if (state.coverPath != null) {
+
+            val file = File(state.coverPath)
+            if (file.exists()) {
+                val uri = Uri.fromFile(file)
+                showSelectedImage(uri)
+            }
         }
 
         state.error?.let {

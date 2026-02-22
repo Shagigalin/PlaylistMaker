@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ItemTrackBinding
-import com.example.playlistmaker.feature_search.domain.model.Track
+import com.example.playlistmaker.feature_playlist.presentation.model.TrackDisplay
 
 class PlaylistTracksAdapter(
-    private val onItemClick: (Track) -> Unit,
-    private val onItemLongClick: (Track) -> Unit
-) : ListAdapter<Track, PlaylistTracksAdapter.TrackViewHolder>(TrackDiffCallback()) {
+    private val onItemClick: (TrackDisplay) -> Unit,
+    private val onItemLongClick: (TrackDisplay) -> Unit
+) : ListAdapter<TrackDisplay, PlaylistTracksAdapter.TrackViewHolder>(TrackDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = ItemTrackBinding.inflate(
@@ -30,20 +30,19 @@ class PlaylistTracksAdapter(
 
     class TrackViewHolder(
         private val binding: ItemTrackBinding,
-        private val onItemClick: (Track) -> Unit,
-        private val onItemLongClick: (Track) -> Unit
+        private val onItemClick: (TrackDisplay) -> Unit,
+        private val onItemLongClick: (TrackDisplay) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(track: Track) {
+        fun bind(track: TrackDisplay) {
             binding.apply {
                 trackName.text = track.trackName
                 artistName.text = track.artistName
-                trackTime.text = track.getFormattedTime()
+                trackTime.text = track.trackTime
 
 
-                val artworkUrl = track.artworkUrl100.replace("100x100", "45x45")
                 Glide.with(itemView.context)
-                    .load(artworkUrl)
+                    .load(track.artworkUrl)
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.placeholder)
                     .centerCrop()
@@ -61,12 +60,12 @@ class PlaylistTracksAdapter(
         }
     }
 
-    class TrackDiffCallback : DiffUtil.ItemCallback<Track>() {
-        override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
+    class TrackDiffCallback : DiffUtil.ItemCallback<TrackDisplay>() {
+        override fun areItemsTheSame(oldItem: TrackDisplay, newItem: TrackDisplay): Boolean {
             return oldItem.trackId == newItem.trackId
         }
 
-        override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
+        override fun areContentsTheSame(oldItem: TrackDisplay, newItem: TrackDisplay): Boolean {
             return oldItem == newItem
         }
     }
