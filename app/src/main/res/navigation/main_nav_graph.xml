@@ -5,10 +5,16 @@
     android:id="@+id/main_nav_graph"
     app:startDestination="@id/mediaLibraryFragment">
 
+    <!-- Глобальные действия -->
     <action
         android:id="@+id/action_global_to_createPlaylistFragment"
         app:destination="@id/createPlaylistFragment" />
 
+    <action
+        android:id="@+id/action_global_to_editPlaylistFragment"
+        app:destination="@id/editPlaylistFragment" />
+
+    <!-- Экран Медиатека -->
     <fragment
         android:id="@+id/mediaLibraryFragment"
         android:name="com.example.playlistmaker.feature_medialibrary.presentation.MediaLibraryFragment"
@@ -23,8 +29,13 @@
             android:id="@+id/action_mediaLibraryFragment_to_createPlaylistFragment"
             app:destination="@id/createPlaylistFragment" />
 
+        <action
+            android:id="@+id/action_mediaLibraryFragment_to_playlistDetailsFragment"
+            app:destination="@id/playlistDetailsFragment" />
+
     </fragment>
 
+    <!-- Экран Поиск -->
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.playlistmaker.feature_search.presentation.SearchFragment"
@@ -37,13 +48,14 @@
 
     </fragment>
 
+    <!-- Экран Настройки -->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.playlistmaker.feature_settings.presentation.SettingsFragment"
         android:label="@string/nastr"
         tools:layout="@layout/fragment_settings" />
 
-    <!-- Экран плеера -->
+    <!-- Экран Плеера -->
     <fragment
         android:id="@+id/playerFragment"
         android:name="com.example.playlistmaker.feature_player.presentation.PlayerFragment"
@@ -58,13 +70,49 @@
             android:id="@+id/action_playerFragment_to_createPlaylistFragment"
             app:destination="@id/createPlaylistFragment" />
 
-
     </fragment>
 
+    <!-- Экран Создания плейлиста -->
     <fragment
         android:id="@+id/createPlaylistFragment"
         android:name="com.example.playlistmaker.feature_playlist.presentation.create.CreatePlaylistFragment"
         android:label="@string/new_playlist"
         tools:layout="@layout/fragment_create_playlist" />
+
+    <!-- Экран Детали плейлиста -->
+    <fragment
+        android:id="@+id/playlistDetailsFragment"
+        android:name="com.example.playlistmaker.feature_playlist.presentation.details.PlaylistDetailsFragment"
+        android:label="@string/playlist"
+        tools:layout="@layout/fragment_playlist_details">
+
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+
+        <!-- Action для перехода на редактирование -->
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment" />
+
+        <!-- Action для перехода на плеер -->
+        <action
+            android:id="@+id/action_playlistDetailsFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+
+    </fragment>
+
+    <!-- Экран Редактирования плейлиста -->
+    <fragment
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.example.playlistmaker.feature_playlist.presentation.edit.EditPlaylistFragment"
+        android:label="@string/edit_playlist"
+        tools:layout="@layout/fragment_create_playlist">
+
+        <argument
+            android:name="playlist"
+            app:argType="com.example.playlistmaker.feature_playlist.domain.model.Playlist" />
+
+    </fragment>
 
 </navigation>
