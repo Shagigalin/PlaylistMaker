@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
+import com.example.playlistmaker.core.NavigationController
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.example.playlistmaker.feature_playlist.domain.model.Playlist
 import com.example.playlistmaker.feature_playlist.presentation.create.CreatePlaylistFragment
@@ -39,6 +40,8 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
 
 
         binding.toolbar.title = getString(R.string.edit_playlist)
@@ -123,5 +126,12 @@ class EditPlaylistFragment : CreatePlaylistFragment() {
         state.error?.let {
 
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+
+        _binding = null
     }
 }

@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity(), NavigationController {
 
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-
             val hideOnDestinations = setOf(
                 R.id.playlistDetailsFragment,
                 R.id.playerFragment,
@@ -44,13 +43,11 @@ class MainActivity : AppCompatActivity(), NavigationController {
     override fun showBottomNavigation(show: Boolean) {
         if (show) {
             binding.bottomNavigationView.visibility = View.VISIBLE
-
             binding.navHostFragment.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 bottomToTop = R.id.bottom_navigation_view
             }
         } else {
             binding.bottomNavigationView.visibility = View.GONE
-
             binding.navHostFragment.updateLayoutParams<ConstraintLayout.LayoutParams> {
                 bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
             }
