@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_bg"
+    >
+
+    <!-- Drag handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:background="@drawable/bottom_sheet_handle" />
+
+    <!-- Информация о плейлисте -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="13dp"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:id="@+id/iv_menu_cover"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder"
+            android:background="@drawable/rounded_corners"
+            android:clipToOutline="true" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_menu_playlist_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="?attr/android:textColorPrimary"
+                android:fontFamily="@font/ys_display_medium"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Мой плейлист" />
+
+            <TextView
+                android:id="@+id/tv_menu_track_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="?attr/colorSurfaceVariant"
+                android:fontFamily="@font/ys_display_regular"
+                tools:text="10 треков" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    <!-- Пункты меню -->
+    <TextView
+        android:id="@+id/menu_share"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:gravity="center_vertical"
+        android:text="@string/share"
+        android:textSize="16sp"
+        android:textFontWeight="400"
+        android:textColor="?attr/android:textColorPrimary"
+        android:fontFamily="@font/ys_display_regular"
+        android:background="?attr/selectableItemBackground"
+        android:paddingStart="16dp"
+
+        android:drawablePadding="16dp" />
+
+    <TextView
+        android:id="@+id/menu_edit"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:gravity="center_vertical"
+        android:text="@string/edit"
+        android:textSize="16sp"
+        android:textFontWeight="400"
+        android:textColor="?attr/android:textColorPrimary"
+        android:fontFamily="@font/ys_display_regular"
+        android:background="?attr/selectableItemBackground"
+        android:paddingStart="16dp"
+
+        android:drawablePadding="16dp" />
+
+    <TextView
+        android:id="@+id/menu_delete"
+        android:layout_width="match_parent"
+        android:layout_height="61dp"
+        android:gravity="center_vertical"
+        android:text="@string/delete"
+        android:textSize="16sp"
+        android:textFontWeight="400"
+        android:textColor="?attr/android:textColorPrimary"
+        android:fontFamily="@font/ys_display_regular"
+        android:background="?attr/selectableItemBackground"
+        android:paddingStart="16dp"
+
+        android:drawablePadding="16dp" />
+
+</LinearLayout>

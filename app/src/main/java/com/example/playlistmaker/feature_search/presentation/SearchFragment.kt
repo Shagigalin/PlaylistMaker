@@ -38,6 +38,9 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupKeyboardListener()
+
         setupAdapters()
         setupViews()
         setupObservers()
@@ -155,5 +158,23 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupKeyboardListener() {
+        binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            val bottomNavView = requireActivity().findViewById<View>(R.id.bottom_navigation_view)
+            if (hasFocus) {
+
+                binding.searchEditText.postDelayed({
+                    bottomNavView?.visibility = View.GONE
+                }, 100)
+            } else {
+                bottomNavView?.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
 }

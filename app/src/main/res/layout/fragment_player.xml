@@ -336,11 +336,11 @@
     <LinearLayout
         android:id="@+id/playlists_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/bottom_sheet_bg"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="400dp"
+        app:behavior_peekHeight="200dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
@@ -366,7 +366,7 @@
         <!-- Кнопка Новый плейлист -->
         <Button
             android:id="@+id/btn_new_playlist"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="Новый плейлист"
@@ -377,7 +377,8 @@
             android:textSize="14sp"
             android:textFontWeight="500"
             android:fontFamily="@font/ys_display_medium"
-            android:paddingVertical="12dp"/>
+
+            android:layout_gravity="center_horizontal"/>
 
 
 
@@ -387,8 +388,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_playlists"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:maxHeight="300dp"
             android:padding="8dp"/>
 
     </LinearLayout>

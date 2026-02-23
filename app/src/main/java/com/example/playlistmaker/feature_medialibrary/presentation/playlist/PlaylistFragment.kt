@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.feature_playlist.domain.model.Playlist
@@ -43,61 +42,30 @@ class PlaylistFragment : Fragment() {
         observeViewModel()
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshPlaylists()
+    }
 
     private fun setupViews() {
         binding.buttonCreatePlaylist.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_mediaLibraryFragment_to_createPlaylistFragment
-            )
+            findNavController().navigate(R.id.action_mediaLibraryFragment_to_createPlaylistFragment)
         }
     }
 
     private fun setupRecyclerView() {
+        // ИСПРАВЛЕНО: используем Bundle для передачи данных
         adapter = PlaylistAdapter { playlist ->
-            Toast.makeText(
-                requireContext(),
-                "Плейлист: ${playlist.name}",
-                Toast.LENGTH_SHORT
-            ).show()
+            val bundle = Bundle().apply {
+                putLong("playlistId", playlist.id)
+            }
+            findNavController().navigate(R.id.action_mediaLibraryFragment_to_playlistDetailsFragment, bundle)
         }
 
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = this@PlaylistFragment.adapter
-
-
-            addItemDecoration(object : RecyclerView.ItemDecoration() {
-                override fun getItemOffsets(
-                    outRect: android.graphics.Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    val position = parent.getChildAdapterPosition(view)
-                    val spanCount = 2
-
-
-                    if (position % spanCount == 0) {
-                        outRect.left = 0
-                        outRect.right = 8.dpToPx()
-                    }
-
-                    else {
-                        outRect.left = 8.dpToPx()
-                        outRect.right = 0
-                    }
-
-
-                    outRect.bottom = 16.dpToPx()
-                }
-            })
         }
-    }
-
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
     }
 
     private fun observeViewModel() {

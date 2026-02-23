@@ -38,5 +38,7 @@ data class PlaylistTrackEntity(
     val previewUrl: String = "",
 
     @ColumnInfo(name = "added_date")
-    val addedDate: Long = System.currentTimeMillis()
+    val addedDate: Long = System.currentTimeMillis(),
+
+
 )

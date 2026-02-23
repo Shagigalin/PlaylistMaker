@@ -53,4 +53,38 @@
         <item name="textAllCaps">false</item>
     </style>
 
+    <style name="AlertDialogTheme_Light" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <!-- Цвет фона диалога -->
+        <item name="android:background">@color/white</item>
+
+        <!-- Цвет заголовка -->
+        <item name="android:titleTextColor">@color/YP_Black</item>
+
+        <!-- Цвет сообщения -->
+        <item name="android:textColor">@color/YP_Black</item>
+
+        <!-- Цвета для кнопок -->
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+
+        <!-- Цвет фона кнопок при нажатии -->
+        <item name="colorControlHighlight">@color/YP_Light_Gray</item>
+    </style>
+
+    <!-- Style for positive button (ДА/Удалить) -->
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
+    <!-- Style for negative button (НЕТ/Отмена) -->
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
 </resources>

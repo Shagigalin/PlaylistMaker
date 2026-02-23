@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
+import com.example.playlistmaker.core.NavigationController
 import com.example.playlistmaker.databinding.FragmentPlayerBinding
 import com.example.playlistmaker.feature_playlist.presentation.adapter.PlaylistBottomSheetAdapter
 import com.example.playlistmaker.utils.CustomToast
@@ -37,6 +38,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPlayerBinding.bind(view)
+
+
 
         setupBottomSheet()
         setupViews()
@@ -293,6 +296,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         _binding = null
     }
 }
